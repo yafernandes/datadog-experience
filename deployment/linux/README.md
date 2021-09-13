@@ -25,6 +25,8 @@ logs:
     container_mode: true
 ```
 
+Individual units can be included/excluded using `include_units`/`exclude_units`.
+
 Journal files are, by default, owned and readable by the systemd-journal system group. To start collecting your journal logs, you need to add the `dd-agent` user to the `systemd-journal` group.
 
 ```bash
