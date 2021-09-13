@@ -1,5 +1,7 @@
 # Datadog deployment
 
+## Firewall requirements
+
 - [Firewall requirements](https://docs.datadoghq.com/agent/guide/network/?tab=agentv6v7)
 - [Log endpoints](https://docs.datadoghq.com/logs/log_collection/?tab=host#logging-endpoints)
 - *.datadog.pool.ntp.org - [NTP Check](https://github.com/DataDog/integrations-core/tree/master/ntp)
