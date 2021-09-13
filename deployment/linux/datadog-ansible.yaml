@@ -1,0 +1,27 @@
+# https://github.com/DataDog/ansible-datadog
+- hosts: all
+  roles:
+    - role: datadog.datadog
+      become: yes
+  vars:
+    datadog_api_key: <API-KEY>
+    datadog_config:
+      env: <ENV>
+      apm_config:
+        enabled: false
+      logs_enabled: true
+      logs_config:
+        compression_level: 6
+        use_compression: true
+        use_http: true
+      process_config:
+        enabled: true
+    network_config:
+      enabled: true
+    datadog_additional_groups:
+      - systemd-journal
+    datadog_checks:
+      journald:
+        logs:
+          - type: journald
+            container_mode: true

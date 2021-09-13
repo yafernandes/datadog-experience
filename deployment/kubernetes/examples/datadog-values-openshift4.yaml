@@ -1,0 +1,69 @@
+###
+# OpenShift 4.8.5
+# Helm Chart 2.21.2
+# Agent 7.30.0
+# Cluster Agent 1.14.0
+###
+datadog:
+  clusterName: openshift
+  apiKeyExistingSecret: datadog-keys
+  apm:
+    portEnabled: true
+  logs:
+    enabled: true
+    containerCollectAll: true
+  processAgent:
+    processCollection: true
+  dogstatsd:
+    useHostPort: true
+  kubeStateMetricsCore:
+    enabled: true
+  kubeStateMetricsEnabled: false
+  kubelet:
+    tlsVerify: false
+  networkMonitoring:
+    enabled: true
+  securityAgent:
+    compliance:
+      enabled: true
+    runtime:
+      enabled: true
+agents:
+  tolerations:
+    - operator: Exists
+  podSecurity:
+    securityContextConstraints:
+      create: true
+  # Uncomment if you are running on a supported cloud provider.
+  # useHostNetwork: true
+clusterAgent:
+  confd:
+    kube_controller_manager.yaml: |-
+      cluster_check: true
+      init_config:
+      instances:
+        - prometheus_url: https://kube-controller-manager.openshift-kube-controller-manager/metrics
+          ssl_verify: false
+          bearer_token_auth: true
+          leader_election: false
+    kube_scheduler.yaml: |-
+      cluster_check: true
+      init_config:
+      instances:
+        - prometheus_url: https://scheduler.openshift-kube-scheduler/metrics
+          ssl_verify: false
+          bearer_token_auth: true
+    kube_apiserver_metrics.yaml: |-
+      cluster_check: true
+      init_config:
+      instances:
+        - prometheus_url: https://apiserver.openshift-kube-apiserver/metrics
+          ssl_verify: false
+          bearer_token_auth: true
+    coredns.yaml: |-
+      cluster_check: true
+      init_config:
+      instances:
+        - prometheus_url: https://dns-default.openshift-dns:9154/metrics
+          ssl_verify: false
+          bearer_token_auth: true

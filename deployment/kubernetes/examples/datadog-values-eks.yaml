@@ -1,0 +1,46 @@
+###
+# EKS 1.21.2
+# Helm Chart 2.21.2
+# Agent 7.30.0
+# Cluster Agent 1.14.0
+###
+datadog:
+  clusterName: eks
+  apiKeyExistingSecret: datadog-keys
+  apm:
+    portEnabled: true
+  logs:
+    enabled: true
+    containerCollectAll: true
+  processAgent:
+    processCollection: true
+  dogstatsd:
+    useHostPort: true
+  kubeStateMetricsCore:
+    enabled: true
+  kubeStateMetricsEnabled: false
+  kubelet:
+    tlsVerify: false
+  networkMonitoring:
+    enabled: true
+  securityAgent:
+    compliance:
+      enabled: true
+    runtime:
+      enabled: true
+clusterAgent:
+  confd:
+    kube_apiserver_metrics.yaml: |-
+      cluster_check: true
+      init_config:
+      instances:
+        - prometheus_url: https://kubernetes.default/metrics
+          ssl_ca_cert: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          bearer_token_auth: true
+    kube_controller_manager.yaml: |-
+      cluster_check: true
+      init_config:
+      instances:
+        - prometheus_url: https://kubernetes.default/metrics
+          ssl_ca_cert: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          bearer_token_auth: true

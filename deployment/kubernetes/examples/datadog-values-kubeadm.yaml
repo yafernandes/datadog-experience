@@ -1,0 +1,54 @@
+###
+# Kubernetes 1.22.0
+# Helm Chart 2.21.2
+# Agent 7.30.0
+# Cluster Agent 1.14.0
+###
+datadog:
+  clusterName: kubeadm
+  apiKeyExistingSecret: datadog-keys
+  apm:
+    portEnabled: true
+  logs:
+    enabled: true
+    containerCollectAll: true
+  processAgent:
+    processCollection: true
+  dogstatsd:
+    useHostPort: true
+  kubeStateMetricsCore:
+    enabled: true
+  kubeStateMetricsEnabled: false
+  kubelet:
+    tlsVerify: false
+  useHostNetwork: true
+  networkMonitoring:
+    enabled: true
+  securityAgent:
+    compliance:
+      enabled: true
+    runtime:
+      enabled: true
+  ignoreAutoConfig:
+    - etcd
+  confd:
+    etcd.yaml: |-
+      ad_identifiers:
+        - etcd
+      init_config:
+      instances:
+        - prometheus_url: https://%%host%%:2379/metrics
+          ssl_ca_cert: /host/etc/kubernetes/pki/etcd/ca.crt
+          ssl_cert: /host/etc/kubernetes/pki/etcd/peer.crt
+          ssl_private_key: /host/etc/kubernetes/pki/etcd/peer.key
+agents:
+  tolerations:
+    - operator: Exists
+  volumeMounts:
+    - mountPath: /host/etc/kubernetes/pki/etcd
+      name: etcd-certs
+  volumes:
+    - name: etcd-certs
+      hostPath:
+        path: /etc/kubernetes/pki/etcd
+        type: DirectoryOrCreate
