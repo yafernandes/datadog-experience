@@ -1,9 +1,9 @@
 # Kubernetes basic monitoring
 
-![2.22.1](https://img.shields.io/badge/Datadog%20chart-2.21.2-632ca6?labelColor=f0f0f0&logo=Helm&logoColor=0f1689)
-![7.31.0](https://img.shields.io/badge/Agent-7.30.0-632ca6?&labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
-![1.15.0](https://img.shields.io/badge/Cluster%20Agent-1.14.0-632ca6?labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
-![1.22.1](https://img.shields.io/badge/Kubernetes-1.22.0-326ce5?labelColor=f0f0f0&logo=Kubernetes&logoColor=326ce5)
+![2.22.1](https://img.shields.io/badge/Datadog%20chart-2.22.1-632ca6?labelColor=f0f0f0&logo=Helm&logoColor=0f1689)
+![7.31.0](https://img.shields.io/badge/Agent-7.31.0-632ca6?&labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
+![1.15.0](https://img.shields.io/badge/Cluster%20Agent-1.15.0-632ca6?labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
+![1.22.1](https://img.shields.io/badge/Kubernetes-1.22.1-326ce5?labelColor=f0f0f0&logo=Kubernetes&logoColor=326ce5)
 
 ## Install
 
