@@ -7,6 +7,8 @@
 
 All yaml snippets below are expected to be **propertly merged** into the main `values.yaml`.
 
+Also tested with [Azure Red Hat OpenShift](https://azure.microsoft.com/en-us/services/openshift/) 4.7.21.
+
 Deploying Datadog will require an [SCC](https://docs.openshift.com/container-platform/4.5/authentication/managing-security-context-constraints.html). Use the snippet below to have our Helm chart [apply it](https://docs.datadoghq.com/integrations/openshift/?tab=helm#configuration).
 
 ```yaml
