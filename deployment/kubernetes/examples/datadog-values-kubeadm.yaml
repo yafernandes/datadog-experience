@@ -43,7 +43,9 @@ datadog:
           ssl_private_key: /host/etc/kubernetes/pki/etcd/peer.key
 agents:
   tolerations:
-    - operator: Exists
+  - key: node-role.kubernetes.io/master
+    operator: Exists
+    effect: NoSchedule
   volumeMounts:
     - mountPath: /host/etc/kubernetes/pki/etcd
       name: etcd-certs

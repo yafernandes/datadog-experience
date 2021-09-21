@@ -1,5 +1,6 @@
 ###
 # OpenShift 4.8.5
+# ARO 4.7.21
 # Helm Chart 2.21.2
 # Agent 7.30.0
 # Cluster Agent 1.14.0
@@ -30,7 +31,9 @@ datadog:
       enabled: true
 agents:
   tolerations:
-    - operator: Exists
+  - key: node-role.kubernetes.io/master
+    operator: Exists
+    effect: NoSchedule
   podSecurity:
     securityContextConstraints:
       create: true
