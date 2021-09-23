@@ -28,10 +28,13 @@ kubectl create secret generic datadog-keys -n datadog --from-literal=api-key=<AP
 
 Create the `values.yaml` file.
 
+:warning: Make sure to update `datadog.site` if sending data to a different Datadog instance.
+
 ```yaml
 datadog:
   clusterName: <CLUSTER-NAME>
   apiKeyExistingSecret: datadog-keys
+  site: datadoghq.com
   apm:
     portEnabled: true
   logs:
