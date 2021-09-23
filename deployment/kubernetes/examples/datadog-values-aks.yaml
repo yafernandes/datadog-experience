@@ -7,6 +7,7 @@
 datadog:
   clusterName: aks
   apiKeyExistingSecret: datadog-keys
+  site: datadoghq.com
   apm:
     portEnabled: true
   logs:

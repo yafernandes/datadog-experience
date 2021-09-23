@@ -8,6 +8,7 @@
 datadog:
   clusterName: openshift
   apiKeyExistingSecret: datadog-keys
+  site: datadoghq.com
   apm:
     portEnabled: true
   logs:
