@@ -1,0 +1,35 @@
+- name: Install containerd
+  hosts:
+    - masters
+    - workers
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Creates containerd.conf
+      copy:
+        content: |
+          overlay
+          br_netfilter
+        dest: /etc/modules-load.d/containerd.conf
+    - shell: modprobe overlay
+    - shell: modprobe br_netfilter
+    - name: Creates 99-kubernetes-cri.conf
+      copy:
+        content: |
+          net.bridge.bridge-nf-call-iptables  = 1
+          net.ipv4.ip_forward                 = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+        dest: /etc/sysctl.d/99-kubernetes-cri.conf
+    - shell: sysctl --system
+    - name: Install required packages
+      apt:
+        name:
+          - containerd
+        update_cache: true
+    - shell: mkdir -p /etc/containerd
+    - shell: containerd config default > /etc/containerd/config.toml
+    - name: Restart containerd
+      systemd:
+        name: containerd
+        state: restarted
+        daemon_reload: yes

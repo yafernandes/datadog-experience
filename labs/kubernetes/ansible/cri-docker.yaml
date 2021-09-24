@@ -1,0 +1,42 @@
+- name: Install Docker
+  hosts:
+    - masters
+    - workers
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - docker.io
+        update_cache: true
+    - name: Create docker group
+      group:
+        name: docker
+        state: present
+    - name: Add user to docker group
+      user:
+        append: yes
+        name: "{{ansible_user}}"
+        groups: docker
+    - name: Sets Docker cgroup driver to systemd
+      copy:
+        content: |
+          {
+            "exec-opts": ["native.cgroupdriver=systemd"],
+            "log-driver": "json-file",
+            "log-opts": {
+              "max-size": "100m"
+            },
+            "storage-driver": "overlay2"
+          }
+        dest: /etc/docker/daemon.json
+    - name: Create systemd directory
+      file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+    - name: Restart Docker
+      systemd:
+        name: docker
+        state: restarted
+        daemon_reload: yes

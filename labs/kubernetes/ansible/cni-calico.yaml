@@ -1,0 +1,7 @@
+# https://docs.projectcalico.org/getting-started/kubernetes/self-managed-onprem/onpremises
+- name: Deploy CNI
+  hosts: master
+  tasks:
+    - name: Deploy Calico
+      become: yes
+      shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml --kubeconfig=/etc/kubernetes/admin.conf

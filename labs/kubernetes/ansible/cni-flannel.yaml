@@ -1,0 +1,6 @@
+- name: Deploy CNI
+  hosts: master
+  tasks:
+    - name: Deploy Flannel
+      become: yes
+      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml --kubeconfig=/etc/kubernetes/admin.conf

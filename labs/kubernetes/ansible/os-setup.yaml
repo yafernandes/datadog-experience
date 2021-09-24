@@ -1,0 +1,23 @@
+- name: Wait for machines to start
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Waiting...
+      wait_for_connection:
+
+- name: Update OS
+  hosts: all
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Upgrade all packages
+      apt:
+        upgrade: full
+        update_cache: true
+    - name: Set hostname
+      hostname:
+        name: "{{ansible_host}}"
+    - name: Set /etc/hostname
+      copy:
+        content: "{{ansible_host}}"
+        dest: /etc/hostname

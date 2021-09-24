@@ -1,0 +1,71 @@
+provider "aws" {
+  region  = var.region
+  profile = "datadog"
+}
+
+resource "tls_private_key" "ssh" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "local_file" "key_file" {
+  filename          = "private_key.pem"
+  file_permission   = "600"
+  sensitive_content = tls_private_key.ssh.private_key_pem
+}
+
+resource "aws_key_pair" "main" {
+  public_key = tls_private_key.ssh.public_key_openssh
+}
+
+resource "aws_instance" "master" {
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.master_instance_type
+  subnet_id              = aws_subnet.main.id
+  vpc_security_group_ids = [aws_security_group.main.id]
+  key_name               = aws_key_pair.main.key_name
+
+  root_block_device {
+    volume_size = 13
+  }
+
+  tags = {
+    Name     = "[${var.namespace}] Master"
+    Creator  = var.creator
+    dns_name = "master"
+  }
+
+  volume_tags = {
+    Name    = "[${var.namespace}] Master"
+    Creator = var.creator
+  }
+}
+
+resource "aws_instance" "worker" {
+  count                  = var.workers_count
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.worker_instance_type
+  subnet_id              = aws_subnet.main.id
+  vpc_security_group_ids = [aws_security_group.main.id]
+  key_name               = aws_key_pair.main.key_name
+
+  root_block_device {
+    volume_size = 40
+  }
+
+  tags = {
+    Name     = "[${var.namespace}] Worker ${format("%02v", count.index)}"
+    Creator  = var.creator
+    dns_name = "worker${format("%02v", count.index)}"
+  }
+
+  volume_tags = {
+    Name    = "[${var.namespace}] Worker ${format("%02v", count.index)}"
+    Creator = var.creator
+  }
+}
+
+resource "local_file" "ansible_inventory" {
+  content  = templatefile("inventory.tmpl", { master = aws_instance.master, workers = aws_instance.worker, namespace = var.namespace, domain = var.domain })
+  filename = "../ansible/inventory.txt"
+}

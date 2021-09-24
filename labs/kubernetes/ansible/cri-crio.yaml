@@ -1,0 +1,57 @@
+- name: Install CRI-O
+  hosts:
+    - masters
+    - workers
+  vars:
+    os: "xUbuntu_{{ansible_facts.lsb.release}}"
+    crio_version: "1.21"
+  become: yes
+  tasks:
+    - name: Creates containerd.conf
+      copy:
+        content: |
+          overlay
+          br_netfilter
+        dest: /etc/modules-load.d/crio.conf
+    - shell: modprobe overlay
+    - shell: modprobe br_netfilter
+    - name: Creates 99-kubernetes-cri.conf
+      copy:
+        content: |
+          net.bridge.bridge-nf-call-iptables  = 1
+          net.ipv4.ip_forward                 = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+        dest: /etc/sysctl.d/99-kubernetes-cri.conf
+    - shell: sysctl --system
+    - name: Add CRI-O GPG key
+      apt_key:
+        url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{os}}/Release.key
+    - name: Add CRI-O GPG key
+      apt_key:
+        url: https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{crio_version}}/{{os}}/Release.key
+    - name: Add CRI-O repo
+      apt_repository:
+        repo: 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{os}}/ /'
+    - name: Add CRI-O repo
+      apt_repository:
+        repo: 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{os}}/ /'
+    - name: Install required packages
+      apt:
+        name:
+          - cri-o
+          - cri-o-runc
+        update_cache: true
+    - name: Restart crio
+      systemd:
+        name: crio
+        enabled: yes
+        state: restarted
+        daemon_reload: yes
+    # - shell: mkdir -p /etc/crio/crio.conf.d
+    # - name: Creates 02-cgroup-manager.conf
+    #   copy:
+    #     content: |
+    #       [crio.runtime]
+    #       conmon_cgroup = "pod"
+    #       cgroup_manager = "cgroupfs"
+    #     dest: /etc/crio/crio.conf.d/02-cgroup-manager.conf
