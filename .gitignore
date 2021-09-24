@@ -1,4 +1,6 @@
 .terraform.lock.hcl
+inventory.txt
+*.pem
 local
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,python,terraform,ansible
