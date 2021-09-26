@@ -1,0 +1,34 @@
+controller:
+  name: nginx-ingress
+  kind: DaemonSet
+  service:
+    type: NodePort
+    nodePorts:
+      http: 30080
+      https: 30443
+  metrics:
+    enabled: true
+  podAnnotations:
+    ad.datadoghq.com/controller.check_names: '["nginx", "nginx_ingress_controller"]'
+    ad.datadoghq.com/controller.init_configs: '[{}, {}]'
+    ad.datadoghq.com/controller.instances: >-
+      [
+        {
+          "nginx_status_url": "http://%%host%%/nginx_status/"
+        },
+        {
+          "prometheus_url": "http://%%host%%:10254/metrics"
+        }
+      ]
+  extraEnvs:
+  - name: DD_AGENT_HOST
+    valueFrom:
+      fieldRef:
+        fieldPath: status.hostIP
+  config:
+    enable-opentracing: "true"
+    datadog-collector-host: $DD_AGENT_HOST
+    ssl-redirect: false
+    proxy-read-timeout: 15
+    proxy-next-upstream-tries: 3
+    nginx-status-ipv4-whitelist: "10.0.0.0/8"
