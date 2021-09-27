@@ -6,6 +6,7 @@ controller:
     nodePorts:
       http: 30080
       https: 30443
+  watchIngressWithoutClass: true
   metrics:
     enabled: true
   podAnnotations:
