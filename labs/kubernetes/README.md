@@ -14,7 +14,7 @@
   export KUBECONFIG="$KUBECONFIG:$HOME/.kube/kubeadm.config"
   ```
 
-- :warning: HIGHLY RECOMMENDED: Create `terraform/terraform.tfvars` with the entries below at minimum. Replace the values in `<>` to you personal values.
+- :warning: HIGHLY RECOMMENDED: Create `terraform/terraform.tfvars` with the entries below at minimum. Replace the values in `< >` to you personal values.
 
   ```terraform
   namespace = <NAMESPACE>
