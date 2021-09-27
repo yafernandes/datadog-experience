@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-simple-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: python-simple-app
+  template:
+    metadata:
+      name: python-simple-app
+      labels:
+        app.kubernetes.io/name: python-simple-app
+    spec:
+      containers:
+        - name: python-simple-app 
+          image: yaalexf/python-simple-app
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "52Mi"
+              cpu: "20m"
+            limits:
+              memory: "64Mi"
+              cpu: "50m"
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_LOGS_INJECTION
+              value: "true"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: python-simple-app
+  name: python-simple-app
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: python-simple-app
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: python-simple-app
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /python-simple-app(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: python-simple-app
+            port:
+              number: 80
