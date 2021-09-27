@@ -1,4 +1,4 @@
-package datadog.ese.tags;
+package datadog.lbe.tags;
 
 import com.timgroup.statsd.NonBlockingStatsDClientBuilder;
 import com.timgroup.statsd.StatsDClient;
