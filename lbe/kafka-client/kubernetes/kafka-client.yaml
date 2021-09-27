@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-client-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kafka-client-producer
+  template:
+    metadata:
+      name: kafka-client-producer
+      labels:
+        app.kubernetes.io/name: kafka-client-producer
+    spec:
+      containers:
+        - name: kafka-client-producer
+          image: yaalexf/kafka-client
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_SERVICE_MAPPING
+              value: kafka:producer_step
+            - name: APP_KAFKA_BOOTSTRAP
+              value: broker.kafka:9092
+            - name: APP_MODE
+              value: producer
+            - name: APP_TOPIC
+              value: queue01
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-client-bridge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kafka-client-bridge
+  template:
+    metadata:
+      name: kafka-client-bridge
+      labels:
+        app.kubernetes.io/name: kafka-client-bridge
+    spec:
+      containers:
+        - name: kafka-client-bridge
+          image: yaalexf/kafka-client
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_SERVICE_MAPPING
+              value: kafka:bridge_step
+            - name: APP_KAFKA_BOOTSTRAP
+              value: broker.kafka:9092
+            - name: APP_MODE
+              value: bridge
+            - name: APP_BRIDGE
+              value: queue01:queue02
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-client-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kafka-client-consumer
+  template:
+    metadata:
+      name: kafka-client-consumer
+      labels:
+        app.kubernetes.io/name: kafka-client-consumer
+    spec:
+      containers:
+        - name: kafka-client-consumer
+          image: yaalexf/kafka-client
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_SERVICE_MAPPING
+              value: kafka:consumer_step
+            - name: APP_KAFKA_BOOTSTRAP
+              value: broker.kafka:9092
+            - name: APP_MODE
+              value: consumer
+            - name: APP_TOPIC
+              value: queue02
