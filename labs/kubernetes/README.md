@@ -17,7 +17,7 @@
 - :warning: HIGHLY RECOMMENDED: Create `terraform/terraform.tfvars` with the entries below at minimum. Replace the values in `< >` to you personal values.
 
   ```terraform
-  namespace = <NAMESPACE>
-  creator = <NAME>
-  region = <REGION>
+  namespace = "<NAMESPACE>"
+  creator = "<NAME>"
+  region = "<REGION>"
   ```
