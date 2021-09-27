@@ -33,3 +33,7 @@ The image can be rebuild with `docker/build.sh`. Make sure to update the image t
 
 [Traces](https://app.datadoghq.com/apm/traces?query=service%3Adatadog.lbe.tags.app)
 [Logs](https://app.datadoghq.com/logs?query=service%3Atags)
+
+## Relevant docs
+
+[Origin detection](https://docs.datadoghq.com/developers/dogstatsd/unix_socket/#using-origin-detection-for-container-tagging)
