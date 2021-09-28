@@ -15,7 +15,7 @@ controller:
     ad.datadoghq.com/controller.instances: >-
       [
         {
-          "nginx_status_url": "http://%%host%%/nginx_status/"
+          "nginx_status_url": "http://%%host%%:18080/nginx_status/"
         },
         {
           "prometheus_url": "http://%%host%%:10254/metrics"
@@ -32,4 +32,20 @@ controller:
     ssl-redirect: false
     proxy-read-timeout: 15
     proxy-next-upstream-tries: 3
-    nginx-status-ipv4-whitelist: "10.0.0.0/8"
+    http-snippet: |
+      server {
+        listen 18080;
+
+        location /nginx_status {
+          opentracing off;
+          allow 192.168.0.0/16;
+          allow 10.0.0.0/8;
+          deny all;
+          access_log off;
+          stub_status on;
+        }
+
+        location / {
+          return 404;
+        }
+      }
