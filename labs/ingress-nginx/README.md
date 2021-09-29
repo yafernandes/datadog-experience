@@ -18,7 +18,7 @@ Deploy NGINX Ingress Controller.
 
 ```bash
 kubectl create ns ingress-nginx
-helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx -f nginx-values.yaml
+helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx -f ingress-nginx-values.yaml
 ```
 
 [Advanced Config options](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/)
