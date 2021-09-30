@@ -1,0 +1,20 @@
+version: "3"
+services:
+  app-java:
+    container_name: app-java
+    image: yaalexf/app-java:latest
+    ports:
+      - "8080:8080/tcp"
+    environment:
+      DD_AGENT_HOST: "192.168.1.5"
+      DD_LOGS_INJECTION: "true"
+      DD_PROFILING_ENABLED: "true"
+    labels:
+      com.datadoghq.ad.logs: >-
+        [
+            {
+                "source": "tomcat",
+                "service": "app-java"
+            }
+        ]
+    restart: unless-stopped

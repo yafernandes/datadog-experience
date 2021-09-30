@@ -1,0 +1,21 @@
+plugins {
+    id 'war'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+}
+
+war {
+    archiveFileName = 'servlet.war'
+}
