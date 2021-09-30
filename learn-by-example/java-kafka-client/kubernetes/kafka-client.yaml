@@ -19,11 +19,11 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "100m"
+              memory: "160Mi"
+              cpu: "20m"
             limits:
-              memory: "512Mi"
-              cpu: "1000m"
+              memory: "256Mi"
+              cpu: "100m"
           env:
             - name: DD_AGENT_HOST
               valueFrom:
@@ -59,11 +59,11 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "100m"
+              memory: "192Mi"
+              cpu: "20m"
             limits:
-              memory: "512Mi"
-              cpu: "1000m"
+              memory: "256Mi"
+              cpu: "100m"
           env:
             - name: DD_AGENT_HOST
               valueFrom:
@@ -99,11 +99,11 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "100m"
+              memory: "192Mi"
+              cpu: "20m"
             limits:
-              memory: "512Mi"
-              cpu: "1000m"
+              memory: "256Mi"
+              cpu: "100m"
           env:
             - name: DD_AGENT_HOST
               valueFrom:
