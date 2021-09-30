@@ -35,8 +35,6 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  labels:
-    app: python-simple-app
   name: python-simple-app
 spec:
   type: NodePort
