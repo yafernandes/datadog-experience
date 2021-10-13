@@ -37,7 +37,7 @@ apiVersion: v1
 metadata:
   name: python-simple-app
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app.kubernetes.io/name: python-simple-app
   ports:
