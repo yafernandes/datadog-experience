@@ -67,7 +67,7 @@ logs:
 
 ## Tips and tricks
 
-- Tailing the access log can show you what request are going through your proxy.
+- Tailing the access log can show you what request are going through your proxy. You can find Squid log format [here](https://wiki.squid-cache.org/Features/LogFormat).
 
 ```bash
 sudo tail -f /var/log/squid/access.log
