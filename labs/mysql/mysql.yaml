@@ -76,6 +76,9 @@ spec:
           name: data
         - mountPath: /docker-entrypoint-initdb.d
           name: initdb
+        - mountPath: /etc/mysql/conf.d/datadog.cnf
+          name: datadog-mysql-conf
+          subPath: datadog.cnf
   volumes:
     - emptyDir: {}
       name: data
@@ -84,6 +87,9 @@ spec:
     - configMap:
         name: datadog-setup-8
       name: datadog-setup
+    - configMap:
+        name: datadog-mysql-conf
+      name: datadog-mysql-conf
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -91,7 +97,7 @@ metadata:
   name: datadog-setup-8
   namespace: mysql
 data:
-  datadog.sql: |-
+  datadog.sql: |
     CREATE USER 'datadog'@'%' IDENTIFIED WITH mysql_native_password by 'datad0g';
     ALTER USER 'datadog'@'%' WITH MAX_USER_CONNECTIONS 5;
     GRANT REPLICATION CLIENT ON *.* TO 'datadog'@'%';
@@ -133,7 +139,6 @@ data:
     END $$
     DELIMITER ;
     GRANT EXECUTE ON PROCEDURE datadog.enable_events_statements_consumers TO datadog@'%';
-
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -141,7 +146,7 @@ metadata:
   name: datadog-mysql-conf
   namespace: mysql
 data:
-  datadog.cnf: |-
+  datadog.cnf: |
     [mysqld]
     performance_schema=ON
     max_digest_length=4096
