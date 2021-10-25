@@ -2,7 +2,7 @@
 
 ![8.0](https://img.shields.io/badge/MySQL-8.0-00758f?labelColor=f0f0f0&logo=MySQL&logoColor=00758f)
 
-Deploys [MySQL](https://www.mysql.com/) with Datadog [DB monitoring] (https://docs.datadoghq.com/database_monitoring/setup_mysql/selfhosted/?tab=mysql80) enabled.
+Deploys [MySQL](https://www.mysql.com/) with Datadog [DB monitoring](https://docs.datadoghq.com/database_monitoring/setup_mysql/selfhosted/?tab=mysql80) enabled.
 
 MySQL will be deployed in the `mysql` namespace, which is automatically created.
 
