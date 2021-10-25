@@ -1,0 +1,163 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mysql
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql
+  namespace: mysql
+  labels:
+    app.kubernetes.io/name: mysql
+  annotations:
+    ad.datadoghq.com/mysql.check_names: '["mysql"]'
+    ad.datadoghq.com/mysql.init_configs: |-
+      [{
+        "service": "mysql"
+      }]
+    ad.datadoghq.com/mysql.instances: |-
+            [
+              {
+                "host": "%%host%%",
+                "user": "datadog",
+                "pass": "datad0g",
+                "dbm": true
+              }
+            ] 
+spec:
+  initContainers:
+    - name: employees-db
+      image: alpine
+      command:
+        - sh
+        - -c
+        - |-
+          wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/employees.sql && \
+          wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/load_departments.dump  && \
+          wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/load_employees.dump && \
+          wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/load_dept_emp.dump  && \
+          wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/load_dept_manager.dump && \
+          wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/load_titles.dump && \
+          wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/load_salaries1.dump && \
+          wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/load_salaries2.dump && \
+          wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/load_salaries3.dump && \
+          wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/show_elapsed.sql && \
+          sed -i 's/source /source \/docker-entrypoint-initdb.d\//' /initdb/*
+          cp /datadog-setup/* /initdb
+      volumeMounts:
+        - mountPath: /initdb
+          name: initdb
+        - mountPath: /datadog-setup
+          name: datadog-setup
+  containers:
+    - name: mysql 
+      image: mysql:8
+      args: 
+        - --default-authentication-plugin=mysql_native_password
+      resources:
+        requests:
+          memory: "832Mi"
+          cpu: "5m"
+        limits:
+          memory: "1Gi"
+          cpu: "1000m"
+      env:
+        - name: MYSQL_RANDOM_ROOT_PASSWORD
+          value: "true"
+        - name: MYSQL_DATABASE
+          value: employees
+        - name: MYSQL_USER
+          value: admin
+        - name: MYSQL_PASSWORD
+          value: datad0g
+      volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: data
+        - mountPath: /docker-entrypoint-initdb.d
+          name: initdb
+  volumes:
+    - emptyDir: {}
+      name: data
+    - emptyDir: {}
+      name: initdb
+    - configMap:
+        name: datadog-setup-8
+      name: datadog-setup
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datadog-setup-8
+  namespace: mysql
+data:
+  datadog.sql: |-
+    CREATE USER 'datadog'@'%' IDENTIFIED WITH mysql_native_password by 'datad0g';
+    ALTER USER 'datadog'@'%' WITH MAX_USER_CONNECTIONS 5;
+    GRANT REPLICATION CLIENT ON *.* TO 'datadog'@'%';
+    GRANT PROCESS ON *.* TO 'datadog'@'%';
+    GRANT SELECT ON performance_schema.* TO 'datadog'@'%';
+
+    CREATE SCHEMA IF NOT EXISTS datadog;
+    GRANT EXECUTE ON datadog.* to datadog@'%';
+    GRANT CREATE TEMPORARY TABLES ON datadog.* TO datadog@'%';
+
+    DELIMITER $$
+    CREATE PROCEDURE datadog.explain_statement(IN query TEXT)
+      SQL SECURITY DEFINER
+    BEGIN
+      SET @explain := CONCAT('EXPLAIN FORMAT=json ', query);
+      PREPARE stmt FROM @explain;
+      EXECUTE stmt;
+      DEALLOCATE PREPARE stmt;
+    END $$
+    DELIMITER ;
+
+    DELIMITER $$
+    CREATE PROCEDURE employees.explain_statement(IN query TEXT)
+        SQL SECURITY DEFINER
+    BEGIN
+        SET @explain := CONCAT('EXPLAIN FORMAT=json ', query);
+        PREPARE stmt FROM @explain;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END $$
+    DELIMITER ;
+    GRANT EXECUTE ON PROCEDURE employees.explain_statement TO datadog@'%';
+
+    DELIMITER $$
+    CREATE PROCEDURE datadog.enable_events_statements_consumers()
+        SQL SECURITY DEFINER
+    BEGIN
+        UPDATE performance_schema.setup_consumers SET enabled='YES' WHERE name LIKE 'events_statements_%';
+    END $$
+    DELIMITER ;
+    GRANT EXECUTE ON PROCEDURE datadog.enable_events_statements_consumers TO datadog@'%';
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datadog-mysql-conf
+  namespace: mysql
+data:
+  datadog.cnf: |-
+    [mysqld]
+    performance_schema=ON
+    max_digest_length=4096
+    performance_schema_max_digest_length=4096
+    performance_schema_max_sql_text_length=4096
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql
+  namespace: mysql
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: mysql
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
