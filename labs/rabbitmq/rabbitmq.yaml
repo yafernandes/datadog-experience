@@ -1,0 +1,180 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rabbitmq
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rabbitmq
+  namespace: rabbitmq
+  labels:
+    app.kubernetes.io/name: rabbitmq
+  annotations:
+    ad.datadoghq.com/rabbitmq.check_names: '["rabbitmq"]'
+    ad.datadoghq.com/rabbitmq.init_configs: |-
+      [{
+        "service": "rabbitmq"
+      }]
+    ad.datadoghq.com/rabbitmq.instances: |-
+      [
+        {
+          "rabbitmq_api_url": "%%host%%:15672/api/",
+          "username": "datadog",
+          "password": "datad0g"
+        }
+      ] 
+
+spec:
+  containers:
+    - name: rabbitmq 
+      image: rabbitmq:3.9-management-alpine
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "20m"
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      volumeMounts:
+        - mountPath: /etc/rabbitmq/conf.d/99-datadog.conf
+          name: rabbitmq-conf
+          subPath: datadog.conf
+        - mountPath: /etc/rabbitmq/definitions.json
+          name: rabbitmq-conf
+          subPath: definitions.json
+  volumes:
+    - configMap:
+        name: rabbitmq-conf
+      name: rabbitmq-conf
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: rabbitmq
+  namespace: rabbitmq
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: rabbitmq
+  ports:
+    - name: rabbitmq
+      port: 5672
+      targetPort: 5672
+    - name: http
+      port: 15672
+      targetPort: 15672
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rabbitmq-ui
+  namespace: rabbitmq
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /rabbitmq(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: rabbitmq
+            port: 
+              number: 15672
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-conf
+  namespace: rabbitmq
+data:
+  datadog.conf: |
+    vm_memory_high_watermark.relative = 0.8
+    load_definitions = /etc/rabbitmq/definitions.json
+  definitions.json: |
+    {
+      "bindings": [
+        {
+          "arguments": {},
+          "destination": "datadog",
+          "destination_type": "queue",
+          "routing_key": "datadog",
+          "source": "datadog",
+          "vhost": "/"
+        }
+      ],
+      "exchanges": [
+        {
+          "arguments": {},
+          "auto_delete": false,
+          "durable": true,
+          "name": "datadog",
+          "type": "direct",
+          "vhost": "/"
+        }
+      ],
+      "global_parameters": [],
+      "parameters": [],
+      "permissions": [
+        {
+          "configure": "^aliveness-test$",
+          "read": ".*",
+          "user": "datadog",
+          "vhost": "/",
+          "write": "^amq\\.default$"
+        },
+        {
+          "configure": ".*",
+          "read": ".*",
+          "user": "guest",
+          "vhost": "/",
+          "write": ".*"
+        }
+      ],
+      "policies": [],
+      "queues": [
+        {
+          "arguments": {},
+          "auto_delete": false,
+          "durable": true,
+          "name": "datadog",
+          "type": "classic",
+          "vhost": "/"
+        }
+      ],
+      "rabbit_version": "3.9.8",
+      "rabbitmq_version": "3.9.8",
+      "topic_permissions": [],
+      "users": [
+        {
+          "hashing_algorithm": "rabbit_password_hashing_sha256",
+          "limits": {},
+          "name": "guest",
+          "password_hash": "HXS9WGl+zQ4X+RGBqNqvbSGWpuIRFnJXb7qm/GigXEd5mv9h",
+          "tags": [
+            "administrator"
+          ]
+        },
+        {
+          "hashing_algorithm": "rabbit_password_hashing_sha256",
+          "limits": {},
+          "name": "datadog",
+          "password_hash": "SnLVvoCsXosFByDmMGyi+FIn25DS6lHU8oPM1JiEXPRCyJtp",
+          "tags": [
+            "monitoring"
+          ]
+        }
+      ],
+      "vhosts": [
+        {
+          "limits": [],
+          "metadata": {
+            "description": "Default virtual host",
+            "tags": []
+          },
+          "name": "/"
+        }
+      ]
+    }
