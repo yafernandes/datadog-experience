@@ -6,6 +6,7 @@ Make a copy of `powershell.exe` so we can set its [persimissions](https://docs.d
 
 ```cmd
 copy C:\Windows\SysWOW64\WindowsPowerShell\v1.0\powershell.exe <PATH>\
+icacls <PATH>\powershell.exe /reset
 icacls <PATH>\powershell.exe /grant:r ddagentuser:RX /grant:r SYSTEM:F /grant:r Administrators:F /inheritancelevel:r
 ```
 
