@@ -2,7 +2,7 @@
 
 ## Windows - PowerShell example
 
-Make a copy of `powershell.exe` so we can set its persimissions without affecting anyone else.
+Make a copy of `powershell.exe` so we can set its [persimissions](https://docs.datadoghq.com/agent/guide/secrets-management/?tab=windows#providing-an-executable) without affecting anyone else.
 
 ```cmd
 copy C:\Windows\SysWOW64\WindowsPowerShell\v1.0\powershell.exe <PATH>\
