@@ -8,8 +8,6 @@ env: <ENVIRONMENT>
 apm_config:
     enabled: true
 logs_enabled: true
-logs_config:
-    container_collect_all: true
 process_config:
     enabled: true
 ```
