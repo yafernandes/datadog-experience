@@ -9,9 +9,6 @@ apm_config:
     enabled: true
 logs_enabled: true
 logs_config:
-    compression_level: 6
-    use_compression: true
-    use_http: true
     container_collect_all: true
 process_config:
     enabled: true
@@ -25,8 +22,10 @@ instances:
   - 
 logs:
   - type: file
-    path: C:\inetpub\logs\LogFiles\*\*.log
+    path: C:\inetpub\logs\LogFiles\W3SVC1\u_ex*
+    service: iis
     source: iis
+    sourcecategory: http_web_access
 ```
 
 Make sure that `ddagentuser` has access to IIS logs. This command gives the `ddagentuser` read access to the files required by the example below.
@@ -114,12 +113,16 @@ instances:
         - 1074
         - 6006
         - 6008
-  - path: Application
-    legacy_mode: false
-    start: oldest
-    filters:
-      source:
-        - MSSQLSERVER
+logs:
+  - type: windows_event
+    channel_path: System
+    source: windows.events
+  - type: windows_event
+    channel_path: Application
+    source: windows.events
+  - type: windows_event
+    channel_path: Security
+    source: windows.events
 ```
 
 ## Performance Counters - [pdh_check.d/conf.yaml](https://github.com/DataDog/integrations-core/blob/master/pdh_check/datadog_checks/pdh_check/data/conf.yaml.example)
