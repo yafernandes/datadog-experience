@@ -96,3 +96,7 @@ Run the command below to view your [nodes taints](https://kubernetes.io/docs/con
 ```bash
 kubectl get nodes -o custom-columns=Node:metadata.name,Taints:spec.taints
 ```
+
+### Tips and Tricks
+
+[Define Dependent Environment Variables](https://kubernetes.io/docs/tasks/inject-data-application/define-interdependent-environment-variables/)
