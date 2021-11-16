@@ -17,14 +17,14 @@ metadata:
         "service": "mysql"
       }]
     ad.datadoghq.com/mysql.instances: |-
-            [
-              {
-                "host": "%%host%%",
-                "user": "datadog",
-                "pass": "datad0g",
-                "dbm": true
-              }
-            ] 
+      [
+        {
+          "host": "%%host%%",
+          "user": "datadog",
+          "pass": "datad0g",
+          "dbm": true
+        }
+      ] 
 spec:
   initContainers:
     - name: employees-db
@@ -76,7 +76,7 @@ spec:
           name: data
         - mountPath: /docker-entrypoint-initdb.d
           name: initdb
-        - mountPath: /etc/mysql/conf.d/datadog.cnf
+        - mountPath: /etc/mysql/conf.d/99-datadog.cnf
           name: datadog-mysql-conf
           subPath: datadog.cnf
   volumes:
