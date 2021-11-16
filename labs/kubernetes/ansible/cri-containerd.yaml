@@ -28,6 +28,12 @@
         update_cache: true
     - shell: mkdir -p /etc/containerd
     - shell: containerd config default > /etc/containerd/config.toml
+    - name: Set SystemdCgroup
+      lineinfile:
+        path: /etc/containerd/config.toml
+        regex: ^(\s*)SystemdCgroup = false
+        line: \g<1>SystemdCgroup = true
+        backrefs: yes
     - name: Restart containerd
       systemd:
         name: containerd
