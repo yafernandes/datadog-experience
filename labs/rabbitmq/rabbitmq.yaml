@@ -74,7 +74,8 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
-  - http:
+  - host: cluster.alexf.aws.pipsquack.ca
+    http:
       paths:
       - path: /rabbitmq(/|$)(.*)
         pathType: Prefix
