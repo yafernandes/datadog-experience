@@ -21,6 +21,13 @@ controller:
           "prometheus_url": "http://%%host%%:10254/metrics"
         }
       ]
+    ad.datadoghq.com/controller.logs: >-
+      [
+        {
+          "source": "nginx-ingress-controller"
+        },
+        {}
+      ]
   extraEnvs:
   - name: DD_AGENT_HOST
     valueFrom:
