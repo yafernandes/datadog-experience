@@ -45,11 +45,6 @@ spec:
           value: "2000"
         - name: EXTRA_ARGS
           value: -Dzookeeper.4lw.commands.whitelist=srvr,stat,mntr
-        volumeMounts:
-          - mountPath: /var/lib/zookeeper/data
-            name: data
-          - mountPath: /var/lib/zookeeper/logs
-            name: logs
         resources:
           requests:
             memory: 256Mi
@@ -57,11 +52,6 @@ spec:
           limits:
             memory: 512Mi
             cpu: 300m
-      volumes:
-      - emptyDir: {}
-        name: data
-      - emptyDir: {}
-        name: logs
 ---
 apiVersion: v1
 kind: Service
@@ -145,9 +135,6 @@ spec:
           value: "9101"
         - name: KAFKA_HEAP_OPTS
           value: -Xms256M -Xmx512M
-        volumeMounts:
-          - mountPath: /var/lib/kafka
-            name: log-dirs
         resources:
           requests:
             memory: 1G
@@ -155,9 +142,6 @@ spec:
           limits:
             memory: 1.5Gi
             cpu: "500m"
-      volumes:
-      - emptyDir: {}
-        name: log-dirs
 ---
 apiVersion: v1
 kind: Service
