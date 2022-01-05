@@ -2,6 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kafka-client-producer
+  labels:
+    tags.datadoghq.com/env: learn-by-example
+    tags.datadoghq.com/service: kafka-client-producer
+    tags.datadoghq.com/version: "0.1"
 spec:
   replicas: 1
   selector:
@@ -12,6 +16,10 @@ spec:
       name: kafka-client-producer
       labels:
         app.kubernetes.io/name: kafka-client-producer
+        admission.datadoghq.com/enabled: "true"
+        tags.datadoghq.com/env: learn-by-example
+        tags.datadoghq.com/service: kafka-client-producer
+        tags.datadoghq.com/version: "0.1"
     spec:
       containers:
         - name: kafka-client-producer
@@ -30,18 +38,26 @@ spec:
                 fieldRef:
                   fieldPath: status.hostIP
             - name: DD_SERVICE_MAPPING
-              value: kafka:producer_step
+              value: kafka:kafka-client-producer
             - name: APP_KAFKA_BOOTSTRAP
               value: broker.kafka:9092
             - name: APP_MODE
               value: producer
             - name: APP_TOPIC
               value: queue01
+            - name: DD_LOGS_INJECTION
+              value: "true"
+            - name: DD_PROFILING_ENABLED
+              value: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kafka-client-bridge
+  labels:
+    tags.datadoghq.com/env: learn-by-example
+    tags.datadoghq.com/service: kafka-client-bridge
+    tags.datadoghq.com/version: "0.1"
 spec:
   replicas: 1
   selector:
@@ -52,6 +68,10 @@ spec:
       name: kafka-client-bridge
       labels:
         app.kubernetes.io/name: kafka-client-bridge
+        admission.datadoghq.com/enabled: "true"
+        tags.datadoghq.com/env: learn-by-example
+        tags.datadoghq.com/service: kafka-client-bridge
+        tags.datadoghq.com/version: "0.1"
     spec:
       containers:
         - name: kafka-client-bridge
@@ -70,18 +90,26 @@ spec:
                 fieldRef:
                   fieldPath: status.hostIP
             - name: DD_SERVICE_MAPPING
-              value: kafka:bridge_step
+              value: kafka:kafka-client-bridge
             - name: APP_KAFKA_BOOTSTRAP
               value: broker.kafka:9092
             - name: APP_MODE
               value: bridge
             - name: APP_BRIDGE
               value: queue01:queue02
+            - name: DD_LOGS_INJECTION
+              value: "true"
+            - name: DD_PROFILING_ENABLED
+              value: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kafka-client-consumer
+  labels:
+    tags.datadoghq.com/env: learn-by-example
+    tags.datadoghq.com/service: kafka-client-consumer
+    tags.datadoghq.com/version: "0.1"
 spec:
   replicas: 1
   selector:
@@ -92,6 +120,10 @@ spec:
       name: kafka-client-consumer
       labels:
         app.kubernetes.io/name: kafka-client-consumer
+        admission.datadoghq.com/enabled: "true"
+        tags.datadoghq.com/env: learn-by-example
+        tags.datadoghq.com/service: kafka-client-consumer
+        tags.datadoghq.com/version: "0.1"
     spec:
       containers:
         - name: kafka-client-consumer
@@ -110,10 +142,14 @@ spec:
                 fieldRef:
                   fieldPath: status.hostIP
             - name: DD_SERVICE_MAPPING
-              value: kafka:consumer_step
+              value: kafka:kafka-client-consumer
             - name: APP_KAFKA_BOOTSTRAP
               value: broker.kafka:9092
             - name: APP_MODE
               value: consumer
             - name: APP_TOPIC
               value: queue02
+            - name: DD_LOGS_INJECTION
+              value: "true"
+            - name: DD_PROFILING_ENABLED
+              value: "true"
