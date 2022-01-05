@@ -19,3 +19,7 @@ kubectl apply -f mysql.yaml
 It will be deployed in the `mysql` namespace and it should be accessable at `http://<cluster>:30080/adminer`.
 
 <img src="img/adminer-login.png" width="200px"/>
+
+## Tips and tricks
+
+- Added `empty_default_hostname` so the integration does not adds hostname tags. The integration would add the container ip. Not adding it allows for the agent to add the proper hostname.
