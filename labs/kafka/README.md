@@ -11,4 +11,6 @@ Kafka will be deployed in the `kafka` namespace, which is automatically created.
 kubectl apply -f kafka.yaml
 ```
 
+:warn: Kafka is monitored using JMX so it requires the Datadog agent `jmx` [image variante](https://hub.docker.com/r/datadog/agent) for monitoring.
+
 Work based on [Quick Start for Confluent Platform - Community Components (Docker)](https://docs.confluent.io/platform/current/quickstart/cos-docker-quickstart.html)
