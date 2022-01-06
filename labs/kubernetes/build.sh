@@ -8,6 +8,11 @@ cd -
 
 cd ansible
 ansible-playbook -i inventory.txt os-setup.yaml --ssh-extra-args="-o IdentitiesOnly=yes"
+
+ansible-playbook -i inventory.txt cri-containerd.yaml --ssh-extra-args="-o IdentitiesOnly=yes" -l master,worker00
+ansible-playbook -i inventory.txt cri-docker.yaml --ssh-extra-args="-o IdentitiesOnly=yes" -l worker01
+ansible-playbook -i inventory.txt cri-crio.yaml --ssh-extra-args="-o IdentitiesOnly=yes" -l worker02
+
 ansible-playbook -i inventory.txt kubernetes.yaml --ssh-extra-args="-o IdentitiesOnly=yes"
 cd -
 

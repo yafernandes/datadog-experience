@@ -1,9 +1,4 @@
 
-- name: Installs Container Runtime
-  import_playbook: cri-containerd.yaml
-  # import_playbook: cri-docker.yaml
-  # import_playbook: cri-crio.yaml
-
 - name: Install Kubernetes binaries
   hosts:
     - masters
