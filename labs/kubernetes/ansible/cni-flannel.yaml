@@ -1,5 +1,6 @@
 - name: Deploy CNI
   hosts: master
+  gather_facts: no
   tasks:
     - name: Deploy Flannel
       become: yes

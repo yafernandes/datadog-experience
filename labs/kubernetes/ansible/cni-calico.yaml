@@ -1,6 +1,7 @@
 # https://docs.projectcalico.org/getting-started/kubernetes/self-managed-onprem/onpremises
 - name: Deploy CNI
   hosts: master
+  gather_facts: no
   tasks:
     - name: Deploy Calico
       become: yes

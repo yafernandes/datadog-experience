@@ -5,7 +5,7 @@
   vars:
     os: "xUbuntu_{{ansible_facts.lsb.release}}"
     crio_version: "1.22"
-  gather_facts: no
+  gather_facts: yes
   become: yes
   tasks:
     - name: Creates containerd.conf
