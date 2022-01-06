@@ -1,9 +1,9 @@
 # AKS - Azure Kubernetes Service
 
-![2.10.1](https://img.shields.io/badge/Datadog%20chart-2.10.1-632ca6?labelColor=f0f0f0&logo=Helm&logoColor=0f1689)
-![7.30.0](https://img.shields.io/badge/Agent-7.30.0-632ca6?&labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
-![1.14.0](https://img.shields.io/badge/Cluster%20Agent-1.14.0-632ca6?labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
-![1.21.2](https://img.shields.io/badge/AKS-1.21.2-0080ff?labelColor=f0f0f0&logo=Microsoft%20Azure&logoColor=0080ff)
+![2.28.13](https://img.shields.io/badge/Datadog%20chart-2.28.13-632ca6?labelColor=f0f0f0&logo=Helm&logoColor=0f1689)
+![7.32.4](https://img.shields.io/badge/Agent-7.32.4-632ca6?&labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
+![1.16.0](https://img.shields.io/badge/Cluster%20Agent-1.16.0-632ca6?labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
+![1.22.4](https://img.shields.io/badge/AKS-1.22.4-0080ff?labelColor=f0f0f0&logo=Microsoft%20Azure&logoColor=0080ff)
 
 All yaml snippets below are expected to be **propertly merged** into the main `values.yaml`.
 
@@ -36,4 +36,30 @@ datadog:
         fieldRef:
           fieldPath: spec.nodeName
     hostCAPath: /etc/kubernetes/certs/kubeletserver.crt
+```
+
+## Windows deployments
+
+Kubernetes deployments with Windows nodes will required a second daemonset, for the Windows nodes. This second daemonset should join the existing Agent Cluster deployed by the Linux daemonset, deployed under the same namespace. Make sure `tokenSecretName` and `serviceName` below contain the correct resource names.
+
+```yaml
+targetSystem: windows
+existingClusterAgent:  
+  join: true
+  tokenSecretName: datadog-cluster-agent
+  serviceName: datadog-cluster-agent
+```
+
+### Windows nodes hostname
+
+Docker is still used for Windows nodes on AKS. Datadog agent hostname for Docker is just the node name, without sufixing it with the cluster name. In order to avoid duplicated hostnames across clusters, you should merge the section below to the Windows daemonset deployment. There is not need to do it for the Linux daemonset since it uses containerd as container runtime.
+
+```yaml
+datadog:
+- name: DD_NODE_NAME
+    valueFrom:
+      fieldRef:
+        fieldPath: spec.nodeName
+  - name: DD_HOSTNAME
+    value: $(DD_NODE_NAME)-$(DD_CLUSTER_NAME)
 ```
