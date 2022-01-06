@@ -27,10 +27,18 @@
 
 - name: Init master
   hosts: master
+  become: yes
   tasks:
+    - name: Creates config.yaml for kubeadm
+      template:
+        src: kubeadm-config.yaml.j2
+        dest: config.yaml
+    - name: Copy policy.yaml
+      copy:
+        src: kubernetes
+        dest: /etc
     - name: Run Kubeadm
-      become: yes
-      shell: kubeadm init --kubernetes-version={{kube_version}} --service-cidr=172.16.0.0/12 --pod-network-cidr=192.168.0.0/16 --apiserver-cert-extra-sans={{ansible_facts.fqdn}},{{ansible_host}},{{ansible_facts.all_ipv4_addresses | join(',')}}
+      shell: kubeadm init --config config.yaml
       register: kubeadm_init
       args:
         creates: /etc/kubernetes/admin.conf
@@ -38,7 +46,6 @@
       debug:
         var: kubeadm_init.stderr_lines
     - name: Get Kubernets join cluster command
-      become: yes
       shell: kubeadm token create --print-join-command
       register: join_cmd
     - name: Export join command
@@ -67,6 +74,3 @@
         src: /etc/kubernetes/admin.conf
         dest: "{{lookup('env','HOME')}}/.kube/kubeadm.config"
         flat: yes
-    - name: Updates the server url to use the public DNS host name
-      shell: kubectl config set clusters.kubernetes.server https://{{ansible_host}}:6443 --kubeconfig={{lookup('env','HOME')}}/.kube/kubeadm.config
-      delegate_to: localhost

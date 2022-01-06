@@ -1,0 +1,37 @@
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+kubernetesVersion: {{kube_version}}
+clusterName: kubeadm
+controlPlaneEndpoint: {{ansible_host}}
+networking:
+  podSubnet: 192.168.0.0/16
+  serviceSubnet: 172.16.0.0/12
+apiServer:
+  certSANs:
+  - {{ansible_facts.fqdn}}
+  - {{ansible_host}}
+{% for ip in ansible_facts.all_ipv4_addresses %}
+  - {{ip}}
+{% endfor %}
+  extraArgs:
+    logging-format: json 
+    audit-log-path: '-'
+    audit-policy-file: /etc/kubernetes/kube-apiserver/audit-policy.yaml
+  extraVolumes:
+  - name: kube-apiserver
+    hostPath: /etc/kubernetes/kube-apiserver
+    mountPath: /etc/kubernetes/kube-apiserver
+    readOnly: true
+scheduler:
+  extraArgs:
+    logging-format: json 
+    address: 0.0.0.0
+controllerManager:
+  extraArgs:
+    logging-format: json 
+    address: 0.0.0.0
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+logging:
+  format: json
