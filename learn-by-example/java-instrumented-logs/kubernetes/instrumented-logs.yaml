@@ -19,7 +19,3 @@ spec:
       limits:
         memory: "256Mi"
         cpu: "200m"
-    env:
-    - name: DD_LOGS_INJECTION
-      value: "true"
-
