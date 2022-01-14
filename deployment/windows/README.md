@@ -17,7 +17,7 @@ process_config:
 ```yaml
 init_config:
 instances:
-  - 
+  - host: .
 logs:
   - type: file
     path: C:\inetpub\logs\LogFiles\W3SVC1\u_ex*
