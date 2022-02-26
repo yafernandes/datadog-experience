@@ -1,7 +1,8 @@
 .terraform.lock.hcl
-inventory.txt
+**/kubernetes/ansible/*-inventory.txt
 *.pem
 local
+*.env
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,python,terraform,ansible
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,python,terraform,ansible

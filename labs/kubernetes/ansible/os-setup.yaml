@@ -4,6 +4,7 @@
   tasks:
     - name: Waiting...
       wait_for_connection:
+       timeout: 1200
 
 - name: Update OS
   hosts: all

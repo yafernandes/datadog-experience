@@ -67,5 +67,5 @@
       become: yes
       fetch:
         src: /etc/kubernetes/admin.conf
-        dest: "{{lookup('env','HOME')}}/.kube/kubeadm.config"
+        dest: "{{lookup('env','HOME')}}/.kube/{{kube_clustername}}.config"
         flat: yes

@@ -11,32 +11,43 @@ It will deploy the required infrastructure in AWS using Terraform.  Using Ansibl
   - [kubectl](https://kubernetes.io/docs/reference/kubectl/overview/)
 - The Terrform component assumes an AWS [credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) file with a profile [datadog] is set.  Currently using an AdmistratorAccess policy attached to the credential.
 - Make sure to initialize Terraform directory with `terraform init` in the `terraform` directory.
-- Add the line below to `~/.bashrc` or which ever $SHELL being used.
+
+- Create `kubeadm.env` based on `kubeadm.env.template`. Below is an example:
 
   ```bash
-  export KUBECONFIG="$KUBECONFIG:$HOME/.kube/kubeadm.config"
-  ```
-
-- :warning: HIGHLY RECOMMENDED: Create `terraform/terraform.tfvars` with the entries below at minimum. Replace the values in `< >` to you personal values.
-
-  ```terraform
-  namespace = "<NAMESPACE>"
-  creator = "<NAME>"
-  region = "<REGION>"
-  domain = "<TOP_LEVEL_DOMAIN>"  // OPTIONAL - pipsquack.ca by default
+  DDEXP_NAMESPACE=jdoe
+  DDEXP_CREATOR=john.doe
+  DDEXP_REGION=us-east-1
+  DDEXP_WORKERS_COUNT=1
+  DDEXP_KUBE_VERSION=1.23.4
   ```
 
 ### Building the K8s Environment
 
-By default, the build.sh script will create one master and one worker node both are t2.large instance type.  If you would like to increase the number of worker nodes, you can edit the terraform/variables.tf file under the `workers_count` section and set the `default` to a higher number.
-
-- `cd ./datadog-experience/labs/kubenetes` or where you cloned your repo
-- `sh build.sh`
+```bash
+./build.sh
+```
 
 ### Destroying the Environment
 
-- `cd ./datadog-experience/labs/kubenetes` or where you cloned your repo
-- `sh destroy.sh`
+```bash
+./destroy.sh
+```
+
+### Accessing the cluster
+
+#### [kubectl](https://kubernetes.io/docs/reference/kubectl/overview/)
+
+The process creates a [kubeconfig](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/) under `$HOME/.kube`. The file name will follow the pattern `$DDEXP_NAMESPACE-kubeadm.config`.
+
+By default, kubectl looks for a file named config in the $HOME/.kube directory. You can specify other kubeconfig files by [setting the KUBECONFIG environment](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/#set-the-kubeconfig-environment-variable) variable or by setting the `--kubeconfig` flag.
+
+#### ssh
+
+The process creates a new pair of ssh keys each time. The private key will be under `./terraform` and will follow the pattern `$DDEXP_NAMESPACE-private_key.pem`. We use the `ubuntu` user. The hostnames are:
+
+- master.$DDEXP_NAMESPACE.aws.pipsquack.ca
+- worker[00-n].$DDEXP_NAMESPACE.aws.pipsquack.ca
 
 ### Troubleshooting
 
@@ -58,7 +69,7 @@ Please type 'yes', 'no' or the fingerprint: yes
 
 ```
 
-To bypass the check, update the `~/.ssh/config` with...
+To bypass the check, update the `$HOME/.ssh/config` with...
 
 ```text
 Host *.pipsquack.ca   # whichever domain being used
@@ -68,4 +79,4 @@ Host *.pipsquack.ca   # whichever domain being used
 
 #### Build does not complete successfully
 
-If for any reason the build does *not* complete successfully, be sure to run the `sh destroy.sh` script afterwards.  This tears down any AWS resources that were created or leftover residuals.
+If for any reason the build does *not* complete successfully, be sure to run the `./destroy.sh` script afterwards.  This tears down any AWS resources that were created or leftover residuals.

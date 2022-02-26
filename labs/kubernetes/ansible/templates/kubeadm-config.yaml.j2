@@ -1,7 +1,7 @@
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
 kubernetesVersion: {{kube_version}}
-clusterName: kubeadm
+clusterName: {{kube_clustername}}
 controlPlaneEndpoint: {{ansible_host}}
 networking:
   podSubnet: 192.168.0.0/16
@@ -24,12 +24,12 @@ apiServer:
     readOnly: true
 scheduler:
   extraArgs:
+    bind-address: 0.0.0.0
     logging-format: json 
-    address: 0.0.0.0
 controllerManager:
   extraArgs:
+    bind-address: 0.0.0.0
     logging-format: json 
-    address: 0.0.0.0
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration

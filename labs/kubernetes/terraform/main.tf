@@ -9,7 +9,7 @@ resource "tls_private_key" "ssh" {
 }
 
 resource "local_file" "key_file" {
-  filename          = "private_key.pem"
+  filename          = "${var.namespace}-private_key.pem"
   file_permission   = "600"
   sensitive_content = tls_private_key.ssh.private_key_pem
 }
@@ -20,7 +20,7 @@ resource "aws_key_pair" "main" {
 
 resource "aws_instance" "master" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.master_instance_type
+  instance_type          = "t2.large"
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.main.id]
   key_name               = aws_key_pair.main.key_name
@@ -44,7 +44,7 @@ resource "aws_instance" "master" {
 resource "aws_instance" "worker" {
   count                  = var.workers_count
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.worker_instance_type
+  instance_type          = "t2.large"
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.main.id]
   key_name               = aws_key_pair.main.key_name
@@ -67,5 +67,5 @@ resource "aws_instance" "worker" {
 
 resource "local_file" "ansible_inventory" {
   content  = templatefile("inventory.tmpl", { master = aws_instance.master, workers = aws_instance.worker, namespace = var.namespace, domain = var.domain })
-  filename = "../ansible/inventory.txt"
+  filename = "../ansible/${var.namespace}-inventory.txt"
 }
