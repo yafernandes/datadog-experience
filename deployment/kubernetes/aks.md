@@ -56,10 +56,20 @@ Docker is still used for Windows nodes on AKS. Datadog agent hostname for Docker
 
 ```yaml
 datadog:
-- name: DD_NODE_NAME
-    valueFrom:
-      fieldRef:
-        fieldPath: spec.nodeName
-  - name: DD_HOSTNAME
-    value: $(DD_NODE_NAME)-$(DD_CLUSTER_NAME)
+  env:
+    - name: DD_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: DD_HOSTNAME
+      value: $(DD_NODE_NAME)-$(DD_CLUSTER_NAME)
+clusterAgent:
+  env:
+    - name: DD_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: DD_HOSTNAME
+      value: $(DD_NODE_NAME)-$(DD_CLUSTER_NAME)
+
 ```
