@@ -20,8 +20,8 @@ metadata:
       [
         {
           "host": "%%host%%",
-          "user": "datadog",
-          "pass": "datad0g",
+          "username": "datadog",
+          "password": "datad0g",
           "dbm": true
         }
       ] 
