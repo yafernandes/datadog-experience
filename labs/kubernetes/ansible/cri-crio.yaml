@@ -4,7 +4,6 @@
     - workers
   vars:
     os: "xUbuntu_{{ansible_facts.lsb.release}}"
-    crio_version: "1.22"
   gather_facts: yes
   become: yes
   tasks:
@@ -29,13 +28,13 @@
         url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{os}}/Release.key
     - name: Add CRI-O GPG key
       apt_key:
-        url: https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{crio_version}}/{{os}}/Release.key
+        url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.23:/1.23.2/{{os}}/Release.key
     - name: Add CRI-O repo
       apt_repository:
         repo: 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{os}}/ /'
     - name: Add CRI-O repo
       apt_repository:
-        repo: 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{crio_version}}/{{os}}/ /'
+        repo: 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.23/{{os}}/ /'
     - name: Install required packages
       apt:
         name:
