@@ -24,6 +24,8 @@ data "aws_caller_identity" "current" {}
 resource "datadog_integration_aws" "account" {
   account_id  = data.aws_caller_identity.current.account_id
   role_name   = var.datadog_role
+  cspm_resource_collection_enabled = var.cspm_resource_collection_enabled
+  resource_collection_enabled = var.resource_collection_enabled
 }
 
 resource "aws_iam_policy" "datadog" {
@@ -64,3 +66,11 @@ resource "aws_iam_role_policy_attachment" "datadog" {
   policy_arn = aws_iam_policy.datadog.arn
 }
 
+#add AWS managed security audit policy if count is true
+#https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/policies/arn:aws:iam::aws:policy/SecurityAudit$jsonEditor
+#description - The security audit template grants access to read security configuration metadata. It is useful for software that audits the configuration of an AWS account.
+resource "aws_iam_role_policy_attachment" "security-audit-policy" {
+  count = var.enable_cspm ? 1 : 0
+  role       = aws_iam_role.datadog.name
+  policy_arn = var.aws_security_audit_policy
+}
