@@ -14,3 +14,21 @@ variable "aws_region" {
 variable "aws_profile" {
   default = "default"
 }
+
+variable "cspm_resource_collection_enabled" {
+  default = true
+}
+
+variable "resource_collection_enabled" {
+  default = true
+}
+
+#enable cspm
+variable "enable_cspm" {
+  default = true
+}
+
+#AWS secrity audit policy for Datadog cspm
+variable "aws_security_audit_policy"{
+  default = "arn:aws:iam::aws:policy/SecurityAudit"
+}
