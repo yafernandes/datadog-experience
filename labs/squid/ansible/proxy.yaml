@@ -1,0 +1,90 @@
+- name: Wait for machines to start
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Waiting...
+      wait_for_connection:
+       timeout: 1200
+
+- name: Update OS
+  hosts: all
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Upgrade all packages
+      apt:
+        upgrade: full
+        update_cache: true
+    - name: Set hostname
+      hostname:
+        name: "{{ansible_host}}"
+    - name: Set /etc/hostname
+      copy:
+        content: "{{ansible_host}}"
+        dest: /etc/hostname
+
+- name: Installs and configure Squid
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Squid
+      apt:
+        name:
+          - squid
+        update_cache: true
+    - name: Copy squid.conf
+      copy:
+        src: squid.conf
+        dest: /etc/squid/squid.conf
+        owner: proxy
+        group: proxy
+    - name: Restart Squid
+      systemd:
+        name: squid
+        state: restarted
+
+# https://github.com/DataDog/ansible-datadog
+# https://galaxy.ansible.com/datadog/datadog
+- hosts: all
+  roles:
+    - role: datadog.datadog
+      become: yes
+  vars:
+    datadog_config:
+      env: lab
+      logs_enabled: true
+      process_config:
+        enabled: true
+      proxy:
+        http: http://localhost:3128/
+        https: http://localhost:3128/
+    network_config:
+      enabled: true
+    datadog_additional_groups:
+      - systemd-journal
+      - proxy
+    datadog_checks:
+      journald:
+        logs:
+          - type: journald
+      squid:
+        init_config:
+          skip_proxy: true
+        instances:
+          - name: squid
+            service: squid
+        logs:
+          - type: file
+            path: /var/log/squid/cache.log
+            source: squid
+            service: squid
+            tags:
+              - env:lab
+          - type: file
+            path: /var/log/squid/access.log
+            source: squid
+            service: squid
+            log_processing_rules:
+              - type: exclude_at_match
+                name: agent_checks
+                pattern: /squid-internal-mgr/counters
