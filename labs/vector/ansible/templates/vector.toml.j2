@@ -1,0 +1,30 @@
+[api]
+enabled = true
+address = "127.0.0.1:8686"
+
+[sources.vector_logs]
+type = "internal_logs"
+
+[sources.vector_metrics]
+type = "internal_metrics"
+scrape_interval_secs = 15
+
+[sources.datadog_agent]
+type = "datadog_agent"
+address = "0.0.0.0:7777"
+multiple_outputs = true
+
+[sinks.datadog_metrics]
+type = "datadog_metrics"
+inputs = [ "vector_metrics", "datadog_agent.metrics" ]
+default_api_key = "{{datadog_api_key}}"
+
+[sinks.datadog_logs]
+type = "datadog_logs"
+inputs = [ "vector_logs", "datadog_agent.logs" ]
+default_api_key = "{{datadog_api_key}}"
+
+[sinks.datadog_traces]
+type = "datadog_traces"
+inputs = [ "datadog_agent.traces" ]
+default_api_key = "{{datadog_api_key}}"

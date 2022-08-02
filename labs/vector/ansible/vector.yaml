@@ -1,0 +1,72 @@
+- name: Wait for machines to start
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Waiting...
+      wait_for_connection:
+       timeout: 1200
+
+- name: Update OS
+  hosts: all
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Upgrade all packages
+      apt:
+        upgrade: full
+        update_cache: true
+    - name: Set hostname
+      hostname:
+        name: "{{ansible_host}}"
+    - name: Set /etc/hostname
+      copy:
+        content: "{{ansible_host}}"
+        dest: /etc/hostname
+
+- name: Installs and configure Vector
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Vector
+      apt:
+        deb: https://packages.timber.io/vector/latest/vector_1_amd64.deb
+    - name: Copy vector.toml
+      template:
+        src: vector.toml.j2
+        dest: /etc/vector/vector.toml
+    - name: Restart Vector
+      systemd:
+        name: vector
+        state: restarted
+
+# https://github.com/DataDog/ansible-datadog
+# https://galaxy.ansible.com/datadog/datadog
+- hosts: all
+  roles:
+    - role: datadog.datadog
+      become: yes
+  vars:
+    datadog_config:
+      env: lab
+      apm_config:
+        enabled: true
+        apm_non_local_traffic: true
+      logs_enabled: true
+      logs_config:
+        use_compression: false
+      vector:
+        logs.enabled: true
+        logs.url: http://localhost:7777/
+        metrics.enabled: true
+        metrics.url: http://localhost:7777/
+      process_config:
+        enabled: true
+      dogstatsd_non_local_traffic: true
+    network_config:
+      enabled: true
+    datadog_additional_groups:
+      - systemd-journal
+    datadog_checks:
+      journald:
+        logs:
+          - type: journald
