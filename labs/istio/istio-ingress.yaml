@@ -1,0 +1,64 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        name: http
+        protocol: HTTP
+        number: 80
+      hosts:
+        - "*"
+#     # - port:
+#     #     name: https
+#     #     protocol: HTTPS
+#     #     number: 443
+#     #   tls:
+#     #     mode: SIMPLE
+#     #     serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+#     #     privateKey: /etc/istio/ingressgateway-certs/tls.key
+#     #   hosts:
+#     #     - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: app-python
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - gateway
+  http:
+    - match:
+        - uri:
+            prefix: /app-python/
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            host: app-python.app-python.svc.cluster.local
+            port:
+              number: 80
+# ---
+# apiVersion: networking.istio.io/v1alpha3
+# kind: VirtualService
+# metadata:
+#   name: app-java
+# spec:
+#   hosts:
+#     - "*"
+#   gateways:
+#     - gateway
+#   http:
+#     - match:
+#         - uri:
+#             prefix: /app-java/
+#       route:
+#         - destination:
+#             host: app-java.default.svc.cluster.local
+#             port:
+#               number: 8000

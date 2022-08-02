@@ -1,0 +1,12 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  namespace: istio-system
+  name: istiocontrolplane
+spec:
+  values:
+    global:
+      proxy:
+        tracer: datadog
+    pilot:
+      traceSampling: 100.0
