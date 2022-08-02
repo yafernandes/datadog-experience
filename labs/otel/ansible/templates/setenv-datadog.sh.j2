@@ -1,0 +1,8 @@
+CATALINA_OPTS="$CATALINA_OPTS -javaagent:/tracers/dd-java-agent.jar"
+export DD_JMXFETCH_TOMCAT_ENABLED=true
+export DD_ENV=lab
+export DD_SERVICE=tomcat-datadog
+export DD_VERSION=$(date +%y%m%d%H%M%S)
+export DD_PROFILING_ENABLED=true
+export DD_APPSEC_ENABLED=true
+export DD_AGENT_HOST=172.17.0.1

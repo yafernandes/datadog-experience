@@ -1,0 +1,24 @@
+# https://docs.datadoghq.com/tracing/trace_collection/open_standards/otel_collector_datadog_exporter/
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  datadog:
+    api:
+      key: {{datadog_api_key}}
+      site: datadoghq.com
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: []
+      exporters: [datadog]
+    metrics:
+      receivers: [otlp]
+      processors: []
+      exporters: [datadog]

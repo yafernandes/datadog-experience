@@ -1,0 +1,162 @@
+- name: Wait for machines to start
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Waiting...
+      wait_for_connection:
+       timeout: 1200
+
+- name: Update OS
+  hosts: all
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Upgrade all packages
+      apt:
+        upgrade: full
+        update_cache: true
+    - name: Set hostname
+      hostname:
+        name: "{{ansible_host}}"
+    - name: Set /etc/hostname
+      copy:
+        content: "{{ansible_host}}"
+        dest: /etc/hostname
+
+- name: Installs and configure OpenTelemetry collector
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install OTel Contrib collector
+      apt:
+        deb: https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.56.0/otelcol-contrib_0.56.0_linux_amd64.deb
+    - name: Copy config.yaml
+      template:
+        src: otel-config.yaml.j2
+        dest: /etc/otelcol-contrib/config.yaml
+    - name: Restart OTel collector
+      systemd:
+        name: otelcol-contrib
+        state: restarted
+
+- name: Deploy Docker
+  hosts: all
+  become: yes
+  tasks:
+    - name: Installs Docker
+      apt:
+        name:
+          - docker.io
+        update_cache: true
+    - name: Copy daemon.json
+      copy:
+        src: docker/daemon.json
+        dest: /etc/docker/daemon.json
+    - name: Adding user to docker group
+      user:
+        name: '{{ ansible_user }}'
+        groups: docker
+        append: yes
+    - name: Restart Docker
+      systemd:
+        name: docker
+        state: restarted
+
+- name: Deploy webbapp
+  hosts: all
+  tasks:
+    - name: Create webapps location
+      file:
+        path: ~/webapps
+        state: directory
+    - name: Copy webapps
+      copy:
+        src: webapps
+        dest: ~/
+    - name: Create tracers locations
+      file:
+        path: ~/tracers
+        state: directory
+    - name: Get Datadog tracer
+      get_url:
+        url: https://dtdg.co/latest-java-tracer
+        dest: ~/tracers/dd-java-agent.jar
+    - name: Get OpenTelemetry tracer
+      get_url:
+        url: https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar
+        dest: ~/tracers/opentelemetry-javaagent.jar
+    - name: Copy datadog-setenv.sh
+      template:
+        src: setenv-datadog.sh.j2
+        dest: ~/setenv-datadog.sh
+        mode: ugo=rwx
+    - name: Copy setenv-otel.sh
+      template:
+        src: setenv-otel.sh.j2
+        dest: ~/setenv-otel.sh
+        mode: u=rwx,go=rx
+    - name: Copy setenv-otel-datadog.sh
+      template:
+        src: setenv-otel-datadog.sh.j2
+        dest: ~/setenv-otel-datadog.sh
+        mode: u=rwx,go=rx
+    - name: Runs Datadog Tomcat
+      become: yes
+      command: docker run -d --rm --name tomcat-datadog -p 8080:8080 -v {{ansible_env.HOME}}/webapps:/usr/local/tomcat/webapps -v {{ansible_env.HOME}}/tracers:/tracers -v {{ansible_env.HOME}}/setenv-datadog.sh:/usr/local/tomcat/bin/setenv.sh tomcat:10-jre11-openjdk-slim
+    - name: Runs OpenTelemetry Tomcat
+      become: yes
+      command: docker run -d --rm --name tomcat-otel -p 9080:8080 -v {{ansible_env.HOME}}/webapps:/usr/local/tomcat/webapps -v {{ansible_env.HOME}}/tracers:/tracers -v {{ansible_env.HOME}}/setenv-otel.sh:/usr/local/tomcat/bin/setenv.sh tomcat:10-jre11-openjdk-slim
+    - name: Runs OpenTelemetry/Datadog Tomcat
+      become: yes
+      command: docker run -d --rm --name tomcat-otel-datadog -p 7080:8080 -v {{ansible_env.HOME}}/webapps:/usr/local/tomcat/webapps -v {{ansible_env.HOME}}/tracers:/tracers -v {{ansible_env.HOME}}/setenv-otel-datadog.sh:/usr/local/tomcat/bin/setenv.sh tomcat:10-jre11-openjdk-slim
+    - name: Generates traffic every minute
+      cron:
+        name: Traffic tomcat-datadog
+        job: curl http://localhost:8080/
+    - name: Generates traffic every minute
+      cron:
+        name: Traffic tomcat-otel
+        job: curl http://localhost:9080/
+    - name: Generates traffic every minute
+      cron:
+        name: Traffic tomcat-otel-datadog
+        job: curl http://localhost:7080/
+
+# https://github.com/DataDog/ansible-datadog
+# https://galaxy.ansible.com/datadog/datadog
+- hosts: all
+  roles:
+    - role: datadog.datadog
+      become: yes
+  vars:
+    datadog_config:
+      env: lab
+      apm_config:
+        enabled: true
+        apm_non_local_traffic: true
+      logs_enabled: true
+      config_providers:
+        - name: docker
+          polling: true
+      listeners:
+        - name: docker
+      process_config:
+        enabled: true
+      otlp_config:
+        receiver:
+          protocols:
+              grpc:
+                endpoint: 0.0.0.0:5317
+              http:
+                endpoint: 0.0.0.0:5318
+    network_config:
+      enabled: true
+    datadog_additional_groups:
+      - systemd-journal
+      - docker
+    datadog_checks:
+      journald:
+        logs:
+          - type: journald
+            container_mode: true
+

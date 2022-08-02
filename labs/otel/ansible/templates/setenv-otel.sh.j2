@@ -1,0 +1,7 @@
+# https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md
+# https://opentelemetry.io/docs/instrumentation/java/automatic/agent-config/
+
+CATALINA_OPTS="$CATALINA_OPTS -javaagent:/tracers/opentelemetry-javaagent.jar"
+export OTEL_SERVICE_NAME=tomcat-otel
+export OTEL_RESOURCE_ATTRIBUTES=deployment.environment=lab,service.version=$(date +%y%m%d%H%M%S)
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://172.17.0.1:4317/
