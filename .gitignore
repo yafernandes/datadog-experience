@@ -1,5 +1,5 @@
 .terraform.lock.hcl
-**/kubernetes/ansible/*-inventory.txt
+**/ansible/*-inventory.txt
 *.pem
 local
 *.env
