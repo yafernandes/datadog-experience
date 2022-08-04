@@ -102,25 +102,25 @@
         mode: u=rwx,go=rx
     - name: Runs Datadog Tomcat
       become: yes
-      command: docker run -d --rm --name tomcat-datadog -p 8080:8080 -v {{ansible_env.HOME}}/webapps:/usr/local/tomcat/webapps -v {{ansible_env.HOME}}/tracers:/tracers -v {{ansible_env.HOME}}/setenv-datadog.sh:/usr/local/tomcat/bin/setenv.sh tomcat:10-jre11-openjdk-slim
+      command: docker run -d --rm --name tomcat-datadog -p 8080:8080 -v {{ansible_env.HOME}}/webapps:/usr/local/tomcat/webapps -v {{ansible_env.HOME}}/tracers:/tracers -v {{ansible_env.HOME}}/setenv-datadog.sh:/usr/local/tomcat/bin/setenv.sh tomcat:9-jre11-openjdk-slim
     - name: Runs OpenTelemetry Tomcat
       become: yes
-      command: docker run -d --rm --name tomcat-otel -p 9080:8080 -v {{ansible_env.HOME}}/webapps:/usr/local/tomcat/webapps -v {{ansible_env.HOME}}/tracers:/tracers -v {{ansible_env.HOME}}/setenv-otel.sh:/usr/local/tomcat/bin/setenv.sh tomcat:10-jre11-openjdk-slim
+      command: docker run -d --rm --name tomcat-otel -p 9080:8080 -v {{ansible_env.HOME}}/webapps:/usr/local/tomcat/webapps -v {{ansible_env.HOME}}/tracers:/tracers -v {{ansible_env.HOME}}/setenv-otel.sh:/usr/local/tomcat/bin/setenv.sh tomcat:9-jre11-openjdk-slim
     - name: Runs OpenTelemetry/Datadog Tomcat
       become: yes
-      command: docker run -d --rm --name tomcat-otel-datadog -p 7080:8080 -v {{ansible_env.HOME}}/webapps:/usr/local/tomcat/webapps -v {{ansible_env.HOME}}/tracers:/tracers -v {{ansible_env.HOME}}/setenv-otel-datadog.sh:/usr/local/tomcat/bin/setenv.sh tomcat:10-jre11-openjdk-slim
+      command: docker run -d --rm --name tomcat-otel-datadog -p 7080:8080 -v {{ansible_env.HOME}}/webapps:/usr/local/tomcat/webapps -v {{ansible_env.HOME}}/tracers:/tracers -v {{ansible_env.HOME}}/setenv-otel-datadog.sh:/usr/local/tomcat/bin/setenv.sh tomcat:9-jre11-openjdk-slim
     - name: Generates traffic every minute
       cron:
         name: Traffic tomcat-datadog
-        job: curl http://localhost:8080/
+        job: curl http://localhost:8080/otel/myip
     - name: Generates traffic every minute
       cron:
         name: Traffic tomcat-otel
-        job: curl http://localhost:9080/
+        job: curl http://localhost:9080/otel/myip
     - name: Generates traffic every minute
       cron:
         name: Traffic tomcat-otel-datadog
-        job: curl http://localhost:7080/
+        job: curl http://localhost:7080/otel/myip
 
 # https://github.com/DataDog/ansible-datadog
 # https://galaxy.ansible.com/datadog/datadog
