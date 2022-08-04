@@ -12,13 +12,17 @@ exporters:
       key: {{datadog_api_key}}
       site: datadoghq.com
 
+processors:
+  resourcedetection:
+    detectors: [system, azure]
+
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: []
+      processors: [resourcedetection]
       exporters: [datadog]
     metrics:
       receivers: [otlp]
-      processors: []
+      processors: [resourcedetection]
       exporters: [datadog]
