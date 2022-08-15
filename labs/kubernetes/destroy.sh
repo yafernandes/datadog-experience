@@ -2,7 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-source $1
+source ${1:-kubeadm.env}
 
 cd terraform
 terraform destroy --auto-approve \
