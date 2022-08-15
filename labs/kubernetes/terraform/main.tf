@@ -8,10 +8,10 @@ resource "tls_private_key" "ssh" {
   rsa_bits  = 4096
 }
 
-resource "local_file" "key_file" {
-  filename          = "${var.namespace}-private_key.pem"
-  file_permission   = "600"
-  sensitive_content = tls_private_key.ssh.private_key_pem
+resource "local_sensitive_file" "key_file" {
+  filename        = "${var.namespace}-private_key.pem"
+  file_permission = "600"
+  content         = tls_private_key.ssh.private_key_pem
 }
 
 resource "aws_key_pair" "main" {
