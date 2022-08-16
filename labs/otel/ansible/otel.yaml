@@ -29,7 +29,7 @@
   tasks:
     - name: Install OTel Contrib collector
       apt:
-        deb: https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.56.0/otelcol-contrib_0.56.0_linux_amd64.deb
+        deb: https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.57.2/otelcol-contrib_0.58.0_linux_amd64.deb
     - name: Copy config.yaml
       template:
         src: otel-config.yaml.j2
