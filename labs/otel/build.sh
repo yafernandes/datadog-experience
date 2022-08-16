@@ -4,6 +4,13 @@ IFS=$'\n\t'
 
 source ${1}.env
 
+cd app
+
+gradle war
+cp build/libs/otel.war ../ansible/files/webapps/
+
+cd -
+
 cd terraform
 
 terraform apply --auto-approve \
