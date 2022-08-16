@@ -2,7 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-source ${1:-kubeadm.env}
+source ${1:-kubeadm}.env
 
 cd terraform
 terraform apply --auto-approve \
@@ -32,5 +32,4 @@ ansible-playbook -i $DDEXP_NAMESPACE-inventory.txt kubernetes.yaml \
   -e ansible_ssh_private_key_file=../terraform/$DDEXP_NAMESPACE-private_key.pem
 cd -
 
-kubectl config rename-context kubernetes-admin@$DDEXP_NAMESPACE-kubeadm $DDEXP_NAMESPACE-kubeadm --kubeconfig ~/.kube/$KUBE_CLUSTERNAME.config
-kubectl config use-context $DDEXP_NAMESPACE-kubeadm  --kubeconfig ~/.kube/$KUBE_CLUSTERNAME.config
+chmod 0600 ~/.kube/$KUBE_CLUSTERNAME.config
