@@ -50,7 +50,7 @@ resource "aws_security_group" "main" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = jsondecode(data.http.dd_ip_ranges.body).synthetics.prefixes_ipv4
+    cidr_blocks = jsondecode(data.http.dd_ip_ranges.response_body).synthetics.prefixes_ipv4
     self        = true
   }
 
