@@ -57,9 +57,10 @@ datadog:
     runtime:
       enabled: true
 agents:
-  - key: node-role.kubernetes.io/master
-    operator: Exists
-    effect: NoSchedule
+  tolerations:
+    - key: node-role.kubernetes.io/master
+      operator: Exists
+      effect: NoSchedule
 ```
 
 All yaml snippets presented from here are expected to be **propertly merged** into the main `values.yaml`.
