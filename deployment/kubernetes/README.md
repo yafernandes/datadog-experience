@@ -19,7 +19,7 @@ Create a namespace for Datadog
 kubectl create ns datadog
 ```
 
-Create a secret with the [API key](https://app.datadoghq.com/account/settings#api).
+Create a secret with the [API key](https://app.datadoghq.com/organization-settings/api-keys).
 
 ```bash
 kubectl create secret generic datadog-keys -n datadog --from-literal=api-key=<API-KEY>
