@@ -34,7 +34,7 @@ resource "azurerm_network_security_group" "main" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = chomp(data.http.myip.body)
+    source_address_prefix      = chomp(data.http.myip.response_body)
     destination_address_prefix = "*"
   }
 
