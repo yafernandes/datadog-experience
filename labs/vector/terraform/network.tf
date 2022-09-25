@@ -34,7 +34,19 @@ resource "azurerm_network_security_group" "main" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = chomp(data.http.myip.body)
+    source_address_prefix      = chomp(data.http.myip.response_body)
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "syslog"
+    priority                   = 101
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Udp"
+    source_port_range          = "*"
+    destination_port_range     = "514"
+    source_address_prefix      = chomp(data.http.myip.response_body)
     destination_address_prefix = "*"
   }
 
@@ -47,31 +59,7 @@ resource "azurerm_network_security_group" "main" {
     source_port_range          = "*"
     destination_port_range     = "7777"
     source_address_prefix      = "*"
-    destination_address_prefix = azurerm_public_ip.main.ip_address
-  }
-
-  security_rule {
-    name                       = "datadog-agent"
-    priority                   = 200
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "8126"
-    source_address_prefix      = "*"
-    destination_address_prefix = azurerm_public_ip.agent.ip_address
-  }
-
-  security_rule {
-    name                       = "datadog-dogstatsd"
-    priority                   = 201
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "8125"
-    source_address_prefix      = "*"
-    destination_address_prefix = azurerm_public_ip.agent.ip_address
+    destination_address_prefix = "*"
   }
 
 }

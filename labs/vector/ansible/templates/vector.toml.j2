@@ -14,6 +14,11 @@ type = "datadog_agent"
 address = "0.0.0.0:7777"
 multiple_outputs = true
 
+[sources.syslog]
+type = "syslog"
+address = "0.0.0.0:514"
+mode = "udp"
+
 [sinks.datadog_metrics]
 type = "datadog_metrics"
 inputs = [ "vector_metrics", "datadog_agent.metrics" ]
@@ -21,7 +26,7 @@ default_api_key = "{{datadog_api_key}}"
 
 [sinks.datadog_logs]
 type = "datadog_logs"
-inputs = [ "vector_logs", "datadog_agent.logs" ]
+inputs = [ "vector_logs", "datadog_agent.logs", "syslog" ]
 default_api_key = "{{datadog_api_key}}"
 
 [sinks.datadog_traces]
