@@ -1,18 +1,19 @@
 # Red Hat OpenShift Container Platform v4
 
-![2.10.1](https://img.shields.io/badge/Datadog%20chart-2.10.1-632ca6?labelColor=f0f0f0&logo=Helm&logoColor=0f1689)
-![7.30.0](https://img.shields.io/badge/Agent-7.30.0-632ca6?&labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
-![1.14.0](https://img.shields.io/badge/Cluster%20Agent-1.14.0-632ca6?labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
-![4.8.5](https://img.shields.io/badge/Open%20Shift-4.8.5-ee0000?labelColor=f0f0f0&logo=Red%20Hat%20Open%20Shift&logoColor=ee0000)
+![3.1.3](https://img.shields.io/badge/Datadog%20chart-3.1.3-632ca6?labelColor=f0f0f0&logo=Helm&logoColor=0f1689)
+![7.39.0](https://img.shields.io/badge/Agent-7.39.0-632ca6?&labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
+![4.11.6](https://img.shields.io/badge/Open%20Shift-4.11.6-ee0000?labelColor=f0f0f0&logo=Red%20Hat%20Open%20Shift&logoColor=ee0000)
 
 All yaml snippets below are expected to be **propertly merged** into the main `values.yaml`.
 
-Also tested with [Azure Red Hat OpenShift](https://azure.microsoft.com/en-us/services/openshift/) 4.7.21.
-
-Deploying Datadog will require an [SCC](https://docs.openshift.com/container-platform/4.5/authentication/managing-security-context-constraints.html). Use the snippet below to have our Helm chart [apply it](https://docs.datadoghq.com/integrations/openshift/?tab=helm#configuration).
+Deploying Datadog will require an [SCC](https://docs.openshift.com/container-platform/4.11/authentication/managing-security-context-constraints.html). Use the snippet below to have our Helm chart [apply it](https://docs.datadoghq.com/integrations/openshift/?tab=helm#configuration).
 
 ```yaml
 agents:
+  podSecurity:
+    securityContextConstraints:
+      create: true
+clusterAgent:
   podSecurity:
     securityContextConstraints:
       create: true
