@@ -34,7 +34,7 @@ resource "azurerm_network_security_group" "main" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = chomp(data.http.myip.body)
+    source_address_prefix      = chomp(data.http.myip.response_body)
     destination_address_prefix = "*"
   }
 
@@ -46,8 +46,8 @@ resource "azurerm_network_security_group" "main" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "5317"
-    source_address_prefix      = "*"
-    destination_address_prefix = azurerm_public_ip.main.ip_address
+    source_address_prefix      = chomp(data.http.myip.response_body)
+    destination_address_prefix = "*"
   }
 
   security_rule {
@@ -58,8 +58,8 @@ resource "azurerm_network_security_group" "main" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "5318"
-    source_address_prefix      = "*"
-    destination_address_prefix = azurerm_public_ip.main.ip_address
+    source_address_prefix      = chomp(data.http.myip.response_body)
+    destination_address_prefix = "*"
   }
 
   security_rule {
@@ -70,8 +70,8 @@ resource "azurerm_network_security_group" "main" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "4317"
-    source_address_prefix      = "*"
-    destination_address_prefix = azurerm_public_ip.main.ip_address
+    source_address_prefix      = chomp(data.http.myip.response_body)
+    destination_address_prefix = "*"
   }
 
   security_rule {
@@ -82,8 +82,8 @@ resource "azurerm_network_security_group" "main" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "4318"
-    source_address_prefix      = "*"
-    destination_address_prefix = azurerm_public_ip.main.ip_address
+    source_address_prefix      = chomp(data.http.myip.response_body)
+    destination_address_prefix = "*"
   }
 
 }
