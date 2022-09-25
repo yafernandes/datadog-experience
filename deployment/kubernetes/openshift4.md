@@ -73,6 +73,29 @@ clusterAgent:
           bearer_token_auth: true
 ```
 
+## OpenShift Metrics
+Datadog collects [OpenShift metrics](https://docs.datadoghq.com/integrations/openshift/?tab=helm#data-collected) for quotas. No metrics will be collected if there are no quotas. You can use the example below to create one and confirm the metrics.
+
+```yaml
+apiVersion: quota.openshift.io/v1
+kind: ClusterResourceQuota
+metadata:
+  name: datadog-quota
+spec:
+  quota:
+    hard:
+      pods: "10" 
+      requests.cpu: "1" 
+      requests.memory: 1Gi 
+      limits.cpu: "2" 
+      limits.memory: 2Gi 
+  selector:
+    labels:
+      matchLabels:
+        kubernetes.io/metadata.name: datadog
+
+```
+
 <sup>1</sup> The CA below works for workers but not master nodes.
 
 ```yaml
