@@ -73,8 +73,8 @@ _cs_host %{notSpace:http.url_details.authority}
 _sc_status %{integer:http.status_code}
 _sc_substatus %{integer:http.sub_status_code}
 _sc_win32_status %{integer:iis.win32_status}
-_sc_bytes %{integer:network.bytes_written}
-_cs_bytes %{integer:network.bytes_read}
+_sc_bytes %{integer:network.bytes_written:integer}
+_cs_bytes %{integer:network.bytes_read:integer}
 _time_taken %{integer:duration:scale(1000000)}
 _trace_id %{notSpace:datadog.trace_id:nullIf("-")}
 ```
