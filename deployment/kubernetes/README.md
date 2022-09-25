@@ -1,9 +1,8 @@
 # Kubernetes basic monitoring
 
-![2.22.1](https://img.shields.io/badge/Datadog%20chart-2.22.1-632ca6?labelColor=f0f0f0&logo=Helm&logoColor=0f1689)
-![7.31.0](https://img.shields.io/badge/Agent-7.31.0-632ca6?&labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
-![1.15.0](https://img.shields.io/badge/Cluster%20Agent-1.15.0-632ca6?labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
-![1.22.1](https://img.shields.io/badge/Kubernetes-1.22.1-326ce5?labelColor=f0f0f0&logo=Kubernetes&logoColor=326ce5)
+![3.1.3](https://img.shields.io/badge/Datadog%20chart-3.1.3-632ca6?labelColor=f0f0f0&logo=Helm&logoColor=0f1689)
+![7.39.0](https://img.shields.io/badge/Agent-7.39.0-632ca6?&labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
+![1.24.5](https://img.shields.io/badge/Kubernetes-1.24.5-326ce5?labelColor=f0f0f0&logo=Kubernetes&logoColor=326ce5)
 
 ## Install
 
@@ -44,9 +43,6 @@ datadog:
     processCollection: true
   dogstatsd:
     useHostPort: true
-  kubeStateMetricsCore:
-    enabled: true
-  kubeStateMetricsEnabled: false
   kubelet:
     tlsVerify: false
   networkMonitoring:
@@ -58,6 +54,9 @@ datadog:
       enabled: true
 agents:
   tolerations:
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
     - key: node-role.kubernetes.io/master
       operator: Exists
       effect: NoSchedule
