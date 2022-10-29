@@ -81,6 +81,30 @@ Complete values file examples can be found [here](examples).
 
 ## Tips and Tricks
 
+### Testing proper networking for APM
+
+If you are not receiving traces from your application, you can test if the agent and Datadog are reachable with the snippet below.
+
+```bash
+curl -X PUT "http://${DD_AGENT_HOST}:8126/v0.3/traces" -v \
+-H "Content-Type: application/json" \
+-d @- << EOF
+[
+  [
+    {
+      "duration": 1500,
+      "name": "Some span",
+      "resource": "/home",
+      "service": "fake-service",
+      "span_id": $(($RANDOM * $RANDOM)),
+      "start": 0,
+      "trace_id": $(($RANDOM * $RANDOM))
+    }
+  ]
+]
+EOF
+```
+
 ### OpenShift
 
 OpenShift [metrics](https://docs.datadoghq.com/integrations/openshift/#metrics) are all about quotas.  The command below must return something for OpenShift specific metrics to show up.
@@ -97,6 +121,7 @@ Run the command below to view your [nodes taints](https://kubernetes.io/docs/con
 kubectl get nodes -o custom-columns=Node:metadata.name,Taints:spec.taints
 ```
 
-### Tips and Tricks
+### Misc
 
 [Define Dependent Environment Variables](https://kubernetes.io/docs/tasks/inject-data-application/define-interdependent-environment-variables/)
+
