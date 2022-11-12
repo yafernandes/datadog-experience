@@ -1,0 +1,360 @@
+# tomcat-fully-instrumented
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-fully-instrumented
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tomcat-fully-instrumented
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tomcat-fully-instrumented
+        admission.datadoghq.com/enabled: "true"
+        tags.datadoghq.com/env: lab
+        tags.datadoghq.com/service: tomcat-fully-instrumented
+        tags.datadoghq.com/version: "0.1"
+      annotations:
+        admission.datadoghq.com/java-lib.version: latest
+    spec:
+      initContainers:
+        - name: init-copy-war
+          image: yaalexf/servlet:war
+          imagePullPolicy: Always
+          command: ["sh", "-c", "cp /build/* /webapps"]
+          volumeMounts:
+            - mountPath: /webapps
+              name: war
+      containers:
+        - name: tomcat
+          image: tomcat:9.0
+          env:
+            - name: DD_APPSEC_ENABLED
+              value: "true"
+            - name: DD_PROFILING_ENABLED
+              value: "true"
+          volumeMounts:
+            - mountPath: /usr/local/tomcat/webapps
+              name: war
+      volumes:
+        - name: war
+          emptyDir:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-fully-instrumented
+spec:
+  selector:
+    app.kubernetes.io/name: tomcat-fully-instrumented
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+#tomcat-basic-instrumented
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-basic-instrumented
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tomcat-basic-instrumented
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tomcat-basic-instrumented
+        admission.datadoghq.com/enabled: "true"
+        tags.datadoghq.com/env: lab
+        tags.datadoghq.com/service: tomcat-basic-instrumented
+        tags.datadoghq.com/version: "0.1"
+      annotations:
+        admission.datadoghq.com/java-lib.version: latest
+    spec:
+      initContainers:
+        - name: init-copy-war
+          image: yaalexf/servlet:war
+          imagePullPolicy: Always
+          command: ["sh", "-c", "cp /build/* /webapps"]
+          volumeMounts:
+            - mountPath: /webapps
+              name: war
+      containers:
+        - name: tomcat
+          image: tomcat:9.0
+          env:
+            - name: DD_APPSEC_ENABLED
+              value: "false"
+            - name: DD_PROFILING_ENABLED
+              value: "false"
+          volumeMounts:
+            - mountPath: /usr/local/tomcat/webapps
+              name: war
+      volumes:
+        - name: war
+          emptyDir:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-basic-instrumented
+spec:
+  selector:
+    app.kubernetes.io/name: tomcat-basic-instrumented
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+# tomcat-profiler-instrumented
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-profiler-instrumented
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tomcat-profiler-instrumented
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tomcat-profiler-instrumented
+        admission.datadoghq.com/enabled: "true"
+        tags.datadoghq.com/env: lab
+        tags.datadoghq.com/service: tomcat-profiler-instrumented
+        tags.datadoghq.com/version: "0.1"
+      annotations:
+        admission.datadoghq.com/java-lib.version: latest
+    spec:
+      initContainers:
+        - name: init-copy-war
+          image: yaalexf/servlet:war
+          imagePullPolicy: Always
+          command: ["sh", "-c", "cp /build/* /webapps"]
+          volumeMounts:
+            - mountPath: /webapps
+              name: war
+      containers:
+        - name: tomcat
+          image: tomcat:9.0
+          env:
+            - name: DD_APPSEC_ENABLED
+              value: "false"
+            - name: DD_PROFILING_ENABLED
+              value: "true"
+          volumeMounts:
+            - mountPath: /usr/local/tomcat/webapps
+              name: war
+      volumes:
+        - name: war
+          emptyDir:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-profiler-instrumented
+spec:
+  selector:
+    app.kubernetes.io/name: tomcat-profiler-instrumented
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+# tomcat-appsec-instrumented
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-appsec-instrumented
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tomcat-appsec-instrumented
+  template:
+    metadata:
+      name: tomcat-appsec-instrumented
+      labels:
+        app.kubernetes.io/name: tomcat-appsec-instrumented
+        admission.datadoghq.com/enabled: "true"
+        tags.datadoghq.com/env: lab
+        tags.datadoghq.com/service: tomcat-appsec-instrumented
+        tags.datadoghq.com/version: "0.1"
+      annotations:
+        admission.datadoghq.com/java-lib.version: latest
+    spec:
+      initContainers:
+        - name: init-copy-war
+          image: yaalexf/servlet:war
+          imagePullPolicy: Always
+          command: ["sh", "-c", "cp /build/* /webapps"]
+          volumeMounts:
+            - mountPath: /webapps
+              name: war
+      containers:
+        - name: tomcat
+          image: tomcat:9.0
+          env:
+            - name: DD_APPSEC_ENABLED
+              value: "true"
+            - name: DD_PROFILING_ENABLED
+              value: "false"
+          volumeMounts:
+            - mountPath: /usr/local/tomcat/webapps
+              name: war
+      volumes:
+        - name: war
+          emptyDir:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-appsec-instrumented
+spec:
+  selector:
+    app.kubernetes.io/name: tomcat-appsec-instrumented
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+# tomcat-non-instrumented
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-non-instrumented
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tomcat-non-instrumented
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tomcat-non-instrumented
+        admission.datadoghq.com/enabled: "true"
+        tags.datadoghq.com/env: lab
+        tags.datadoghq.com/service: tomcat-non-instrumented
+        tags.datadoghq.com/version: "0.1"
+    spec:
+      initContainers:
+        - name: init-copy-war
+          image: yaalexf/servlet:war
+          imagePullPolicy: Always
+          command: ["sh", "-c", "cp /build/* /webapps"]
+          volumeMounts:
+            - mountPath: /webapps
+              name: war
+      containers:
+        - name: tomcat
+          image: tomcat:9.0
+          volumeMounts:
+            - mountPath: /usr/local/tomcat/webapps
+              name: war
+      volumes:
+        - name: war
+          emptyDir:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-non-instrumented
+spec:
+  selector:
+    app.kubernetes.io/name: tomcat-non-instrumented
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+# tomcat-otel-instrumented
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-otel-instrumented
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tomcat-otel-instrumented
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tomcat-otel-instrumented
+        admission.datadoghq.com/enabled: "true"
+        tags.datadoghq.com/env: lab
+        tags.datadoghq.com/service: tomcat-otel-instrumented
+        tags.datadoghq.com/version: "0.1"
+    spec:
+      initContainers:
+        - name: init-copy-war
+          image: yaalexf/servlet:war
+          imagePullPolicy: Always
+          command: ["sh", "-c", "cp /build/* /webapps"]
+          volumeMounts:
+            - mountPath: /webapps
+              name: war
+        - name: init-copy-otel
+          image: yaalexf/servlet:war
+          imagePullPolicy: Always
+          command: ["sh", "-c", "wget -O /otel/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar"]
+          volumeMounts:
+            - mountPath: /otel
+              name: otel
+      containers:
+        - name: tomcat
+          image: tomcat:9.0
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-javaagent:/otel/opentelemetry-javaagent.jar"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://datadog.datadog:4317/
+            - name: OTEL_SERVICE_NAME
+              value: tomcat-otel-instrumented
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: deployment.environment=lab,service.version=1.0
+          volumeMounts:
+            - mountPath: /usr/local/tomcat/webapps
+              name: war
+            - mountPath: /otel
+              name: otel
+      volumes:
+        - name: war
+          emptyDir:
+        - name: otel
+          emptyDir:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-otel-instrumented
+spec:
+  selector:
+    app.kubernetes.io/name: tomcat-otel-instrumented
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+# loadrunner
+apiVersion: v1
+kind: Pod
+metadata:
+  name: loadrunner
+spec:
+  containers:
+    - name: load
+      image: yaalexf/servlet:war
+      imagePullPolicy: Always
+      command: ["sh", "-c", "--"]
+      args:
+        - |-
+          while true
+          do
+            wget -qO /dev/nul  tomcat-fully-instrumented:80/servlet/hello_world
+            wget -qO /dev/nul  tomcat-basic-instrumented:80/servlet/hello_world
+            wget -qO /dev/nul  tomcat-profiler-instrumented:80/servlet/hello_world
+            wget -qO /dev/nul  tomcat-appsec-instrumented:80/servlet/hello_world
+            wget -qO /dev/nul  tomcat-non-instrumented:80/servlet/hello_world
+            wget -qO /dev/nul  tomcat-otel-instrumented:80/servlet/hello_world
+            sleep 1s
+          done
