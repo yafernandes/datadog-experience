@@ -1,9 +1,8 @@
 ###
-# OpenShift 4.8.5
-# ARO 4.7.21
 # Helm Chart 2.21.2
 # Agent 7.30.0
-# Cluster Agent 1.14.0
+# OpenShift 4.11.4
+# ARO 4.7.21
 ###
 datadog:
   clusterName: openshift
@@ -18,9 +17,6 @@ datadog:
     processCollection: true
   dogstatsd:
     useHostPort: true
-  kubeStateMetricsCore:
-    enabled: true
-  kubeStateMetricsEnabled: false
   kubelet:
     tlsVerify: false
   networkMonitoring:
@@ -31,16 +27,22 @@ datadog:
     runtime:
       enabled: true
 agents:
-  tolerations:
-  - key: node-role.kubernetes.io/master
-    operator: Exists
-    effect: NoSchedule
   podSecurity:
     securityContextConstraints:
       create: true
+  tolerations:
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+    - key: node-role.kubernetes.io/master
+      operator: Exists
+      effect: NoSchedule
   # Uncomment if you are running on a supported cloud provider.
   # useHostNetwork: true
 clusterAgent:
+  podSecurity:
+    securityContextConstraints:
+      create: true
   confd:
     kube_controller_manager.yaml: |-
       cluster_check: true
