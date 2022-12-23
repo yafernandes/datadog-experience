@@ -1,0 +1,27 @@
+###
+# Helm Chart 3.6.5
+# Agent 7.41.0
+# Kubernetes v1.24.7-gke.900
+###
+datadog:
+  clusterName: gke-example
+  apiKeyExistingSecret: datadog-keys
+  site: datadoghq.com
+  apm:
+    portEnabled: true
+  logs:
+    enabled: true
+    containerCollectAll: true
+  processAgent:
+    processCollection: true
+  dogstatsd:
+    useHostPort: true
+  networkMonitoring:
+    enabled: true
+  kubelet:
+    tlsVerify: false
+  securityAgent:
+    compliance:
+      enabled: true
+    runtime:
+      enabled: true
