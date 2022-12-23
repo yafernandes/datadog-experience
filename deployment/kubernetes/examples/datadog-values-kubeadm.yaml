@@ -1,11 +1,10 @@
 ###
-# Helm Chart 2.22.1
-# Agent 7.31.0
-# Cluster Agent 1.15.0
-# Kubernetes 1.22.1
+# Helm Chart 3.6.5
+# Agent 7.41.0
+# Kubernetes 1.26.0
 ###
 datadog:
-  clusterName: kubeadm
+  clusterName: kubeadm-example
   apiKeyExistingSecret: datadog-keys
   site: datadoghq.com
   apm:
@@ -17,19 +16,22 @@ datadog:
     processCollection: true
   dogstatsd:
     useHostPort: true
-  kubeStateMetricsCore:
-    enabled: true
-  kubeStateMetricsEnabled: false
-  kubelet:
-    tlsVerify: false
-  useHostNetwork: true
   networkMonitoring:
     enabled: true
+  kubelet:
+    tlsVerify: false
   securityAgent:
     compliance:
       enabled: true
     runtime:
       enabled: true
+  env:
+    - name: DD_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: DD_HOSTNAME
+      value: $(DD_NODE_NAME)-$(DD_CLUSTER_NAME)
   ignoreAutoConfig:
     - etcd
   confd:
@@ -44,7 +46,7 @@ datadog:
           ssl_private_key: /host/etc/kubernetes/pki/etcd/peer.key
 agents:
   tolerations:
-  - key: node-role.kubernetes.io/master
+  - key: node-role.kubernetes.io/control-plane
     operator: Exists
     effect: NoSchedule
   volumeMounts:
