@@ -1,7 +1,7 @@
 ###
-# Helm Chart 3.6.5
 # Agent 7.41.0
-# Kubernetes v1.24.7-gke.900
+# GKE v1.24.7-gke.900
+# Helm Chart 3.6.5
 ###
 datadog:
   clusterName: gke-example
@@ -18,10 +18,10 @@ datadog:
     useHostPort: true
   networkMonitoring:
     enabled: true
-  kubelet:
-    tlsVerify: false
   securityAgent:
     compliance:
       enabled: true
     runtime:
       enabled: true
+  kubelet:
+    tlsVerify: false
