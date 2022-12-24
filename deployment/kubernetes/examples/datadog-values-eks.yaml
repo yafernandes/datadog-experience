@@ -1,11 +1,10 @@
 ###
-# EKS 1.21.2
-# Helm Chart 2.21.2
-# Agent 7.30.0
-# Cluster Agent 1.14.0
+# Agent 7.41.0
+# GKE v1.24.7-eks-fb459a0
+# Helm Chart 3.6.5
 ###
 datadog:
-  clusterName: eks
+  clusterName: eks-example
   apiKeyExistingSecret: datadog-keys
   site: datadoghq.com
   apm:
@@ -17,11 +16,6 @@ datadog:
     processCollection: true
   dogstatsd:
     useHostPort: true
-  kubeStateMetricsCore:
-    enabled: true
-  kubeStateMetricsEnabled: false
-  kubelet:
-    tlsVerify: false
   networkMonitoring:
     enabled: true
   securityAgent:
@@ -29,6 +23,8 @@ datadog:
       enabled: true
     runtime:
       enabled: true
+  kubelet:
+    tlsVerify: false
 clusterAgent:
   confd:
     kube_apiserver_metrics.yaml: |-
