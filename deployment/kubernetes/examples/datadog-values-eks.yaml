@@ -1,6 +1,6 @@
 ###
 # Agent 7.41.0
-# GKE v1.24.7-eks-fb459a0
+# EKS v1.24.7-eks-fb459a0
 # Helm Chart 3.6.5
 ###
 datadog:
