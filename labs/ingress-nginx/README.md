@@ -1,7 +1,7 @@
 # NGINX Ingress Controller
 
-![4.0.3](https://img.shields.io/badge/NGINX%20Ingress%20chart-4.0.3-009539?labelColor=f0f0f0&logo=Helm&logoColor=009539)
-![1.0.2](https://img.shields.io/badge/NGINX%20Ingress%20Controller-1.0.2-009539?labelColor=f0f0f0&logo=NGINX&logoColor=009539)
+![4.6.0](https://img.shields.io/badge/NGINX%20Ingress%20chart-4.6.0-009539?labelColor=f0f0f0&logo=Helm&logoColor=009539)
+![1.7.0](https://img.shields.io/badge/NGINX%20Ingress%20Controller-1.7.0-009539?labelColor=f0f0f0&logo=NGINX&logoColor=009539)
 
 Deploys an NGINX Ingress Controller with [monitoring](https://docs.datadoghq.com/integrations/nginx_ingress_controller) and [APM](https://docs.datadoghq.com/tracing/setup_overview/proxy_setup/?tab=nginx#nginx-ingress-controller-for-kubernetes) enabled. The deployment uses [NodePort](https://kubernetes.io/docs/concepts/services-networking/service/#nodeport) for simplicity.
 
@@ -20,5 +20,7 @@ Deploy NGINX Ingress Controller.
 kubectl create ns ingress-nginx
 helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx -f ingress-nginx-values.yaml
 ```
+
+:warning: Regular expressions and wild cards are not supported in the `spec.rules.host` field. Full hostnames must be used.  -- [docs](https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/#regular-expression-support)
 
 [Advanced Config options](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/)
