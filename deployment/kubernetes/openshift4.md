@@ -2,7 +2,7 @@
 
 ![3.1.3](https://img.shields.io/badge/Datadog%20chart-3.1.3-632ca6?labelColor=f0f0f0&logo=Helm&logoColor=0f1689)
 ![7.39.0](https://img.shields.io/badge/Agent-7.39.0-632ca6?&labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
-![4.11.6](https://img.shields.io/badge/Open%20Shift-4.11.6-ee0000?labelColor=f0f0f0&logo=Red%20Hat%20Open%20Shift&logoColor=ee0000)
+![4.11.4](https://img.shields.io/badge/Open%20Shift-4.11.4-ee0000?labelColor=f0f0f0&logo=Red%20Hat%20Open%20Shift&logoColor=ee0000)
 
 All yaml snippets below are expected to be **propertly merged** into the main `values.yaml`.
 
@@ -71,6 +71,36 @@ clusterAgent:
         - prometheus_url: https://dns-default.openshift-dns:9154/metrics
           ssl_verify: false
           bearer_token_auth: true
+```
+
+## etcd
+
+```bash
+kubectl get cm kube-etcd-client-certs -n openshift-monitoring -o json | jq jq '.metadata.namespace = "datadog"' | kubectl create -f -
+```
+
+https://github.com/dynatrace-extensions/etcd-for-k8s-control-plane/
+
+```yaml
+agents:
+  volumeMounts:
+    - mountPath: /host/etcd/certs
+      name: etcd-certs
+  volumes:
+    - name: etcd-certs
+      configMap:
+        name: kube-etcd-client-certs
+clusterAgent:
+  confd:
+    etcd.yaml: |-
+      cluster_check: true
+      init_config:
+      instances:
+        - prometheus_url: https://etcd.openshift-etcd:2379/metrics
+          ssl_ca_cert: /host/etcd/certs/etcd-client-ca.crt
+          ssl_cert: /host/etcd/certs/etcd-client.crt
+          ssl_private_key: /host/etcd/certs/etcd-client.key
+
 ```
 
 ## OpenShift Metrics

@@ -79,6 +79,20 @@ helm install datadog datadog/datadog -n datadog -f values.yaml
 
 Complete values file examples can be found [here](examples).
 
+## Proxy
+
+The values in the `DD_PROXY_NO_PROXY` variable are:
+
+- k8s.aws.pipsquack.ca - Hosts domain
+- cluster.local - Kubernetes dns zone - `kubectl describe configmap coredns -n kube-system`
+- 10.0.0.0/16 - Cluster address space
+- 172.16.0.0/12 - Kubernets service address space - `/etc/kubernetes/manifests/kube-controller-manager.yaml`
+- 192.168.0.0/16 - Kubernetes pods address space - `/etc/kubernetes/manifests/kube-controller-manager.yaml`
+
+:warning: List is SPACE delimited.
+
+[http_proxy vs HTTP_PROXY](https://about.gitlab.com/blog/2021/01/27/we-need-to-talk-no-proxy/)
+
 ## Tips and Tricks
 
 ### Testing proper networking for APM

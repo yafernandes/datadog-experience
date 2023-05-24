@@ -10,3 +10,9 @@ You will receive an error `Timeout: request did not complete within requested ti
 The reason is that the admission controller service handling incoming connections receives the request on port 443 and directs it to a service implemented by the Cluster Agent on port 8000.
 
 By default, in the Network for the cluster there should be a Firewall Rule named like gke-<CLUSTER_NAME>-master. The “Source filters” of the rule match the “Control plane address range” of the cluster. Edit this Firewall Rule to allow ingress to the TCP port 8000.
+
+## Resources
+
+[Setting resource limits in Autopilot](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-resource-requests#resource-limits) - Autopilot only considers requests.
+
+[Minimum and maximum resource requests](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-resource-requests#min-max-requests)

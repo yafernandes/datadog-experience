@@ -1,11 +1,21 @@
 # AKS - Azure Kubernetes Service
 
-![2.28.13](https://img.shields.io/badge/Datadog%20chart-2.28.13-632ca6?labelColor=f0f0f0&logo=Helm&logoColor=0f1689)
-![7.32.4](https://img.shields.io/badge/Agent-7.32.4-632ca6?&labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
-![1.16.0](https://img.shields.io/badge/Cluster%20Agent-1.16.0-632ca6?labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
+![3.6.2](https://img.shields.io/badge/Datadog%20chart-2.28.13-632ca6?labelColor=f0f0f0&logo=Helm&logoColor=0f1689)
+![7.40.0](https://img.shields.io/badge/Agent-7.32.4-632ca6?&labelColor=f0f0f0&logo=Datadog&logoColor=632ca6)
 ![1.22.4](https://img.shields.io/badge/AKS-1.22.4-0080ff?labelColor=f0f0f0&logo=Microsoft%20Azure&logoColor=0080ff)
 
 All yaml snippets below are expected to be **propertly merged** into the main `values.yaml`.
+
+## [Adimission Controller](https://docs.datadoghq.com/containers/kubernetes/distributions/?tab=helm#AKS)
+
+Admission Controller functionality on AKS requires configuring the add selectors to prevent an error on reconciling the webhook.
+
+```yaml
+providers:
+  aks:
+    enabled: true
+```
+
 
 ## Control Plane
 
