@@ -2,7 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-source ${1:-kubeadm}.env
+source $1.env
 
 cd terraform
 terraform apply --auto-approve \
@@ -33,3 +33,9 @@ ansible-playbook -i $DDEXP_NAMESPACE-inventory.txt kubernetes.yaml \
 cd -
 
 chmod 0600 ~/.kube/$KUBE_CLUSTERNAME.config
+
+zip -j9 $1.zip \
+  ~/.kube/$KUBE_CLUSTERNAME.config \
+  terraform/$DDEXP_NAMESPACE-private_key.pem \
+  ansible/$DDEXP_NAMESPACE-inventory.txt
+
