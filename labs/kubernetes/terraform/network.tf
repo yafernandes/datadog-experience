@@ -16,7 +16,7 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = "true"
 
   tags = {
-    Name = var.namespace
+    Name = "${var.namespace} Kubernetes"
     Creator = var.creator
   }
 }
@@ -28,7 +28,7 @@ resource "aws_subnet" "main" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = var.namespace
+    Name = "${var.namespace} Kubernetes"
     Creator = var.creator
   }
 }
@@ -46,11 +46,28 @@ resource "aws_security_group" "main" {
   }
 
   // Datadog synthetics origins
+  # ingress {
+  #   from_port   = 0
+  #   to_port     = 0
+  #   protocol    = "-1"
+  #   cidr_blocks = jsondecode(data.http.dd_ip_ranges.response_body).synthetics.prefixes_ipv4
+  #   self        = true
+  # }
+
+  // Datadog synthetics origins
   ingress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = jsondecode(data.http.dd_ip_ranges.response_body).synthetics.prefixes_ipv4
+    cidr_blocks = jsondecode(data.http.dd_ip_ranges.response_body).synthetics.prefixes_ipv4_by_location["aws:us-east-1"]
+    self        = true
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = jsondecode(data.http.dd_ip_ranges.response_body).synthetics.prefixes_ipv4_by_location["aws:us-east-2"]
     self        = true
   }
 
@@ -62,7 +79,7 @@ resource "aws_security_group" "main" {
   }
 
   tags = {
-    Name = var.namespace
+    Name = "${var.namespace} Kubernetes"
     Creator = var.creator
   }
 }
@@ -71,7 +88,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name    = var.namespace
+    Name = "${var.namespace} Kubernetes"
     Creator = var.creator
   }
 }
@@ -85,7 +102,7 @@ resource "aws_route_table" "main" {
   }
 
   tags = {
-    Name = var.namespace
+    Name = "${var.namespace} Kubernetes"
     Creator = var.creator
   }
 }
