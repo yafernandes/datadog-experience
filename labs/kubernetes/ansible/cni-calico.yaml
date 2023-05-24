@@ -5,4 +5,4 @@
   tasks:
     - name: Deploy Calico
       become: yes
-      shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml --kubeconfig=/etc/kubernetes/admin.conf
+      shell: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/calico.yaml --kubeconfig=/etc/kubernetes/admin.conf
