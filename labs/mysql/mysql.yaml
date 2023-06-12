@@ -4,6 +4,39 @@ metadata:
   name: mysql
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: db-passwords
+  namespace: mysql
+stringData:
+  mysql: datad0g
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: db-passwords
+  namespace: mysql
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["nginx-secret"]
+    verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: db-passwords
+  namespace: mysql
+subjects:
+  - kind: ServiceAccount
+    name: datadog
+    namespace: datadog
+roleRef:
+  kind: Role
+  name: db-passwords
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
 kind: Pod
 metadata:
   name: mysql
@@ -21,7 +54,7 @@ metadata:
         {
           "host": "%%host%%",
           "username": "datadog",
-          "password": "datad0g",
+          "password": "ENC[k8s_secret@mysql/db-passwords/mysql]",
           "dbm": true
         }
       ] 
@@ -136,6 +169,7 @@ data:
         SQL SECURITY DEFINER
     BEGIN
         UPDATE performance_schema.setup_consumers SET enabled='YES' WHERE name LIKE 'events_statements_%';
+        UPDATE performance_schema.setup_consumers SET enabled='YES' WHERE name = 'events_waits_current';
     END $$
     DELIMITER ;
     GRANT EXECUTE ON PROCEDURE datadog.enable_events_statements_consumers TO datadog@'%';
@@ -152,6 +186,10 @@ data:
     max_digest_length=4096
     performance_schema_max_digest_length=4096
     performance_schema_max_sql_text_length=4096
+    performance-schema-consumer-events-statements-current=ON
+    performance-schema-consumer-events-waits-current=ON
+    performance-schema-consumer-events-statements-history-long=ON
+    performance-schema-consumer-events-statements-history=ON
 ---
 kind: Service
 apiVersion: v1
