@@ -6,6 +6,8 @@ Deploys [MySQL](https://www.mysql.com/) with Datadog [DB monitoring](https://doc
 
 MySQL will be deployed in the `mysql` namespace, which is automatically created.
 
+:warning: This example assumes the [script for reading from multiple secret providers](https://docs.datadoghq.com/agent/guide/secrets-management/?tab=linux#script-for-reading-from-multiple-secret-providers) is being used.
+
 ```bash
 kubectl apply -f mysql.yaml
 ```
