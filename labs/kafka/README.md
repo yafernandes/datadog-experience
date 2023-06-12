@@ -1,7 +1,7 @@
 # Kafka
 
-![6.2.1](https://img.shields.io/badge/Confluent-6.2.1-173362?labelColor=f0f0f0&logo=ApacheKafka&logoColor=173362)
-![2.8.0](https://img.shields.io/badge/Kafka-2.8.0-000000?labelColor=f0f0f0&logo=ApacheKafka&logoColor=000000)
+![7.3.3](https://img.shields.io/badge/Confluent-7.3.3-173362?labelColor=f0f0f0&logo=ApacheKafka&logoColor=173362)
+![3.3.x](https://img.shields.io/badge/Kafka-3.3.x-000000?labelColor=f0f0f0&logo=ApacheKafka&logoColor=000000)
 
 Deploys [Kafka](https://docs.datadoghq.com/integrations/kafka) and [Zookeper](https://docs.datadoghq.com/integrations/zk) with monitoring enabled, including [Kafka Consumer](https://docs.datadoghq.com/integrations/kafka/#kafka-consumer-integration). The deployment is single node for simplicity.
 
