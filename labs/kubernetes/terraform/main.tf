@@ -20,7 +20,7 @@ resource "aws_key_pair" "main" {
 
 resource "aws_instance" "master" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.large"
+  instance_type          = "t4g.large"
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.main.id]
   key_name               = aws_key_pair.main.key_name
@@ -44,7 +44,7 @@ resource "aws_instance" "master" {
 resource "aws_instance" "worker" {
   count                  = var.workers_count
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.large"
+  instance_type          = "t4g.large"
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.main.id]
   key_name               = aws_key_pair.main.key_name
