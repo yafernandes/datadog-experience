@@ -1,50 +1,52 @@
-
 - name: Install Kubernetes binaries
   hosts:
     - masters
     - workers
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   tasks:
     - name: Add Kubernetes GPG key
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
     - name: Add Kubernetes repo
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: 'deb https://apt.kubernetes.io/ kubernetes-xenial main'
     - name: Install Kubernetes packages
-      apt:
+      ansible.builtin.apt:
         name:
-          - kubelet={{kube_version}}-00
-          - kubeadm={{kube_version}}-00
-          - kubectl={{kube_version}}-00
-        update_cache: yes
+          - kubelet={{ kube_version }}-00
+          - kubeadm={{ kube_version }}-00
+          - kubectl={{ kube_version }}-00
+        update_cache: true
 
 - name: Init master
   hosts: master
-  become: yes
+  become: true
   tasks:
     - name: Creates config.yaml for kubeadm
-      template:
+      ansible.builtin.template:
         src: kubeadm-config.yaml.j2
         dest: config.yaml
+        mode: '0440'
     - name: Copy policy.yaml
-      copy:
+      ansible.builtin.copy:
         src: kubernetes
         dest: /etc
+        mode: '0400'
     - name: Run Kubeadm
-      shell: kubeadm init --config config.yaml
+      ansible.builtin.command: kubeadm init --config config.yaml
       register: kubeadm_init
       args:
         creates: /etc/kubernetes/admin.conf
-    - name: kubeadm init output
-      debug:
+    - name: Kubeadm init output
+      ansible.builtin.debug:
         var: kubeadm_init.stderr_lines
     - name: Get Kubernets join cluster command
-      shell: kubeadm token create --print-join-command
+      ansible.builtin.command: kubeadm token create --print-join-command
+      changed_when: false
       register: join_cmd
     - name: Export join command
-      set_fact:
+      ansible.builtin.set_fact:
         join_cmd: "{{ join_cmd.stdout }}"
 
 - name: Deploy Container Network
@@ -53,19 +55,20 @@
 
 - name: Join master
   hosts: workers
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   tasks:
     - name: Joining cluster
-      shell: "{{ hostvars['master'].join_cmd }}"
+      ansible.builtin.command: "{{ hostvars['master'].join_cmd }}"
+      changed_when: false
 
 - name: Updates local kubectl config
   hosts: master
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Copy admin.conf to localhost
-      become: yes
-      fetch:
+      become: true
+      ansible.builtin.fetch:
         src: /etc/kubernetes/admin.conf
-        dest: "{{lookup('env','HOME')}}/.kube/{{kube_clustername}}.config"
-        flat: yes
+        dest: "{{ lookup('env', 'HOME') }}/.kube/{{ kube_clustername }}.config"
+        flat: true

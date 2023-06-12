@@ -2,40 +2,68 @@
   hosts:
     - masters
     - workers
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   tasks:
     - name: Creates containerd.conf
-      copy:
+      ansible.builtin.copy:
         content: |
           overlay
           br_netfilter
         dest: /etc/modules-load.d/containerd.conf
-    - shell: modprobe overlay
-    - shell: modprobe br_netfilter
-    - name: Creates 99-kubernetes-cri.conf
-      copy:
-        content: |
-          net.bridge.bridge-nf-call-iptables  = 1
-          net.ipv4.ip_forward                 = 1
-          net.bridge.bridge-nf-call-ip6tables = 1
-        dest: /etc/sysctl.d/99-kubernetes-cri.conf
-    - shell: sysctl --system
+        mode: '0400'
+    - name: Add overlay module
+      community.general.modprobe:
+        name: overlay
+    - name: Add overlay br_netfilter
+      community.general.modprobe:
+        name: br_netfilter
+    - name: Set net.bridge.bridge-nf-call-iptables
+      ansible.posix.sysctl:
+        name: net.bridge.bridge-nf-call-iptables
+        value: '1'
+        sysctl_file: /etc/sysctl.d/99-kubernetes-cri.conf
+        reload: false
+    - name: Set net.ipv4.ip_forward
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_file: /etc/sysctl.d/99-kubernetes-cri.conf
+        reload: false
+    - name: Set net.bridge.bridge-nf-call-ip6tables
+      ansible.posix.sysctl:
+        name: net.bridge.bridge-nf-call-ip6tables
+        value: '1'
+        sysctl_file: /etc/sysctl.d/99-kubernetes-cri.conf
+        reload: true
     - name: Install required packages
-      apt:
+      ansible.builtin.apt:
         name:
           - containerd
         update_cache: true
-    - shell: mkdir -p /etc/containerd
-    - shell: containerd config default > /etc/containerd/config.toml
+    - name: Create /etc/containerd
+      ansible.builtin.file:
+        path: /etc/containerd
+        state: directory
+        mode: '0755'
+      changed_when: false
+    - name: Generated containerd config
+      ansible.builtin.command: containerd config default
+      changed_when: false
+      register: containerd_config
+    - name: Creates containerd config
+      ansible.builtin.copy:
+        content: "{{ containerd_config.stdout }}"
+        dest: /etc/containerd/config.toml
+        mode: "0400"
     - name: Set SystemdCgroup
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/containerd/config.toml
         regex: ^(\s*)SystemdCgroup = false
         line: \g<1>SystemdCgroup = true
-        backrefs: yes
+        backrefs: true
     - name: Restart containerd
-      systemd:
+      ansible.builtin.systemd:
         name: containerd
         state: restarted
-        daemon_reload: yes
+        daemon_reload: true

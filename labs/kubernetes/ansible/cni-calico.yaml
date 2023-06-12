@@ -1,8 +1,15 @@
 # https://docs.projectcalico.org/getting-started/kubernetes/self-managed-onprem/onpremises
 - name: Deploy CNI
   hosts: master
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Deploy Calico
-      become: yes
-      shell: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/calico.yaml --kubeconfig=/etc/kubernetes/admin.conf
+      become: true
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - apply
+          - -f
+          - https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/calico.yaml
+          - --kubeconfig=/etc/kubernetes/admin.conf
+      changed_when: false

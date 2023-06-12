@@ -1,24 +1,25 @@
 - name: Wait for machines to start
   hosts: all
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Waiting...
-      wait_for_connection:
-       timeout: 1200
+      ansible.builtin.wait_for_connection:
+        timeout: 1200
 
 - name: Update OS
   hosts: all
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   tasks:
     - name: Upgrade all packages
-      apt:
+      ansible.builtin.apt:
         upgrade: full
         update_cache: true
     - name: Set hostname
-      hostname:
-        name: "{{ansible_host}}"
+      ansible.builtin.hostname:
+        name: "{{ ansible_host }}"
     - name: Set /etc/hostname
-      copy:
-        content: "{{ansible_host}}"
+      ansible.builtin.copy:
+        content: "{{ ansible_host }}"
         dest: /etc/hostname
+        mode: '0644'
