@@ -28,7 +28,7 @@ metadata:
 spec:
   containers:
     - name: rabbitmq 
-      image: rabbitmq:3.9-management-alpine
+      image: rabbitmq:3.11-management-alpine
       resources:
         requests:
           memory: "256Mi"
@@ -74,11 +74,10 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
-  - host: cluster.alexf.aws.pipsquack.ca
-    http:
+  - http:
       paths:
       - path: /rabbitmq(/|$)(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: rabbitmq
