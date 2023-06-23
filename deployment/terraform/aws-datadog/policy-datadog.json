@@ -35,6 +35,7 @@
                 "es:ListDomainNames",
                 "es:DescribeElasticsearchDomains",
                 "events:CreateEventBus",
+                "events:PutPartnerEvents",
                 "fsx:DescribeFileSystems",
                 "fsx:ListTagsForResource",
                 "health:DescribeEvents",
