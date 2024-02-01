@@ -11,6 +11,26 @@ The reason is that the admission controller service handling incoming connection
 
 By default, in the Network for the cluster there should be a Firewall Rule named like gke-<CLUSTER_NAME>-master. The “Source filters” of the rule match the “Control plane address range” of the cluster. Edit this Firewall Rule to allow ingress to the TCP port 8000. - [public doc](◊https://docs.datadoghq.com/containers/cluster_agent/admission_controller/?tab=operator#notes)
 
+## Cilium - Dataplane V2
+
+Merge the snippet below.
+
+```yaml
+  ignoreAutoConfig:
+  - cilium
+  confd:
+    cilium.yaml: |-
+      ad_identifiers:
+        - cilium-agent
+        - cilium
+      init_config:
+      instances:
+        - agent_endpoint: http://%%host%%:9990/metrics
+          use_openmetrics: true
+          tags:
+            - cilium-pod:%%host%%
+```
+
 ## Resources
 
 [Setting resource limits in Autopilot](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-resource-requests#resource-limits) - Autopilot only considers requests.
