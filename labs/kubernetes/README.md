@@ -46,8 +46,8 @@ By default, kubectl looks for a file named config in the $HOME/.kube directory. 
 
 The process creates a new pair of ssh keys each time. The private key will be under `./terraform` and will follow the pattern `<namespace>-private_key.pem`. We use the `ubuntu` user. The hostnames are:
 
-- controller.<namespace>.aws.pipsquack.ca
-- worker[00-n].<namespace>.aws.pipsquack.ca
+- `controller.<namespace>.aws.pipsquack.ca`
+- `worker[00-n].<namespace>.aws.pipsquack.ca`
 
 ### Troubleshooting
 
