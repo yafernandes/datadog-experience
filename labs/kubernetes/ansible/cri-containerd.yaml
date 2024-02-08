@@ -1,6 +1,6 @@
 - name: Install containerd
   hosts:
-    - masters
+    - control_plane
     - workers
   gather_facts: false
   become: true
@@ -61,6 +61,12 @@
         path: /etc/containerd/config.toml
         regex: ^(\s*)SystemdCgroup = false
         line: \g<1>SystemdCgroup = true
+        backrefs: true
+    - name: Set sandbox image
+      ansible.builtin.lineinfile:
+        path: /etc/containerd/config.toml
+        regex: ^(\s*)sandbox_image = .*
+        line: \g<1>sandbox_image = "registry.k8s.io/pause:3.9"
         backrefs: true
     - name: Restart containerd
       ansible.builtin.systemd:

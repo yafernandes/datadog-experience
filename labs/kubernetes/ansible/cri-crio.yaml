@@ -1,52 +1,52 @@
 - name: Install CRI-O
   hosts:
-    - masters
+    - control_plane
     - workers
   vars:
     os: "xUbuntu_{{ansible_facts.lsb.release}}"
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: Creates containerd.conf
-      copy:
+      ansible.builtin.copy:
         content: |
           overlay
           br_netfilter
         dest: /etc/modules-load.d/crio.conf
-    - shell: modprobe overlay
-    - shell: modprobe br_netfilter
+    - ansible.builtin.shell: modprobe overlay
+    - ansible.builtin.shell: modprobe br_netfilter
     - name: Creates 99-kubernetes-cri.conf
-      copy:
+      ansible.builtin.copy:
         content: |
           net.bridge.bridge-nf-call-iptables  = 1
           net.ipv4.ip_forward                 = 1
           net.bridge.bridge-nf-call-ip6tables = 1
         dest: /etc/sysctl.d/99-kubernetes-cri.conf
-    - shell: sysctl --system
+    - ansible.builtin.shell: sysctl --system
     - name: Add CRI-O GPG key
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{os}}/Release.key
     - name: Add CRI-O GPG key
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.23:/1.23.2/{{os}}/Release.key
     - name: Add CRI-O repo
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{os}}/ /'
     - name: Add CRI-O repo
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.23/{{os}}/ /'
     - name: Install required packages
-      apt:
+      ansible.builtin.apt:
         name:
           - cri-o
           - cri-o-runc
         update_cache: true
     - name: Restart crio
-      systemd:
+      ansible.builtin.systemd:
         name: crio
-        enabled: yes
+        enabled: true
         state: restarted
-        daemon_reload: yes
+        daemon_reload: true
     # - shell: mkdir -p /etc/crio/crio.conf.d
     # - name: Creates 02-cgroup-manager.conf
     #   copy:

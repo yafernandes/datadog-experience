@@ -2,12 +2,12 @@ data "aws_route53_zone" "root" {
   name = var.domain
 }
 
-resource "aws_route53_record" "master" {
+resource "aws_route53_record" "controller" {
   zone_id = data.aws_route53_zone.root.zone_id
-  name    = "${aws_instance.master.tags.dns_name}.${var.namespace}"
+  name    = "${aws_instance.controller.tags.dns_name}.${var.namespace}"
   type    = "CNAME"
   ttl     = "60"
-  records = [aws_instance.master.public_dns]
+  records = [aws_instance.controller.public_dns]
 }
 
 resource "aws_route53_record" "worker" {

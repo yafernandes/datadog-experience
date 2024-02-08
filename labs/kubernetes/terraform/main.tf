@@ -18,9 +18,9 @@ resource "aws_key_pair" "main" {
   public_key = tls_private_key.ssh.public_key_openssh
 }
 
-resource "aws_instance" "master" {
+resource "aws_instance" "controller" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t4g.large"
+  instance_type          = var.instance_types[var.architecture]
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.main.id]
   key_name               = aws_key_pair.main.key_name
@@ -30,13 +30,13 @@ resource "aws_instance" "master" {
   }
 
   tags = {
-    Name     = "[${var.namespace}] Master"
+    Name     = "[${var.namespace}] controller"
     Creator  = var.creator
-    dns_name = "master"
+    dns_name = "controller"
   }
 
   volume_tags = {
-    Name    = "[${var.namespace}] Master"
+    Name    = "[${var.namespace}] controller"
     Creator = var.creator
   }
 }
@@ -44,7 +44,7 @@ resource "aws_instance" "master" {
 resource "aws_instance" "worker" {
   count                  = var.workers_count
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t4g.large"
+  instance_type          = var.instance_types[var.architecture]
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.main.id]
   key_name               = aws_key_pair.main.key_name
@@ -54,7 +54,7 @@ resource "aws_instance" "worker" {
   }
 
   tags = {
-    Name     = "[${var.namespace}] Worker ${format("%02v", count.index)}"
+    Name     = "[${var.namespace}] worker ${format("%02v", count.index)}"
     Creator  = var.creator
     dns_name = "worker${format("%02v", count.index)}"
   }
@@ -66,6 +66,6 @@ resource "aws_instance" "worker" {
 }
 
 resource "local_file" "ansible_inventory" {
-  content  = templatefile("inventory.tmpl", { master = aws_instance.master, workers = aws_instance.worker, namespace = var.namespace, domain = var.domain })
+  content  = templatefile("inventory.tmpl", { controller = aws_instance.controller, workers = aws_instance.worker, namespace = var.namespace, domain = var.domain })
   filename = "../ansible/${var.namespace}-inventory.txt"
 }

@@ -1,5 +1,5 @@
 - name: Deploy CNI
-  hosts: master
+  hosts: control_plane
   gather_facts: no
   tasks:
     - name: Deploy Flannel

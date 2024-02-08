@@ -1,26 +1,26 @@
 - name: Install Kubernetes binaries
   hosts:
-    - masters
+    - control_plane
     - workers
   gather_facts: false
   become: true
   tasks:
     - name: Add Kubernetes GPG key
       ansible.builtin.apt_key:
-        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        url: https://pkgs.k8s.io/core:/stable:/v{{ kube_version | regex_replace('^(\d+\.\d+)\.\d+', '\1') }}/deb/Release.key
     - name: Add Kubernetes repo
       ansible.builtin.apt_repository:
-        repo: 'deb https://apt.kubernetes.io/ kubernetes-xenial main'
+        repo: deb https://pkgs.k8s.io/core:/stable:/v{{ kube_version | regex_replace('^(\d+\.\d+)\.\d+', '\1') }}/deb/ /
     - name: Install Kubernetes packages
       ansible.builtin.apt:
         name:
-          - kubelet={{ kube_version }}-00
-          - kubeadm={{ kube_version }}-00
-          - kubectl={{ kube_version }}-00
+          - kubelet={{ kube_version }}-*
+          - kubeadm={{ kube_version }}-*
+          - kubectl={{ kube_version }}-*
         update_cache: true
 
-- name: Init master
-  hosts: master
+- name: Init controller
+  hosts: control_plane
   become: true
   tasks:
     - name: Creates config.yaml for kubeadm
@@ -38,6 +38,10 @@
       register: kubeadm_init
       args:
         creates: /etc/kubernetes/admin.conf
+    - name: Sets KUBECONFIG
+      ansible.builtin.lineinfile:
+        dest: "/etc/environment"
+        line: "KUBECONFIG=/etc/kubernetes/admin.conf"
     - name: Kubeadm init output
       ansible.builtin.debug:
         var: kubeadm_init.stderr_lines
@@ -50,20 +54,19 @@
         join_cmd: "{{ join_cmd.stdout }}"
 
 - name: Deploy Container Network
-  import_playbook: cni-calico.yaml
-  # import_playbook: cni-flannel.yaml
+  import_playbook: cni-{{ cni }}.yaml
 
-- name: Join master
+- name: Join control plane
   hosts: workers
   gather_facts: false
   become: true
   tasks:
     - name: Joining cluster
-      ansible.builtin.command: "{{ hostvars['master'].join_cmd }}"
+      ansible.builtin.command: "{{ hostvars['controller'].join_cmd }}"
       changed_when: false
 
 - name: Updates local kubectl config
-  hosts: master
+  hosts: control_plane
   gather_facts: false
   tasks:
     - name: Copy admin.conf to localhost

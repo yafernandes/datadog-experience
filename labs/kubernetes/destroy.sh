@@ -19,8 +19,8 @@ terraform destroy --auto-approve \
   -var="region=$DDEXP_REGION" \
   -var="namespace=$DDEXP_NAMESPACE" \
   -var="creator=$DDEXP_CREATOR" \
-  -var="workers_count=$DDEXP_WORKERS_COUNT"
-
+  -var="workers_count=$DDEXP_WORKERS_COUNT" \
+  -var="architecture=$DDEXP_ARCHITECTURE"
 cd -
 
 resources=$(cat terraform/terraform.tfstate.d/$DDEXP_NAMESPACE/terraform.tfstate | jq '.resources | length')

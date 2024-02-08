@@ -1,26 +1,26 @@
-- name: Install Docker
+- name: Install Dockerapt
   hosts:
-    - masters
+    - control_plane
     - workers
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   tasks:
     - name: Install required packages
-      apt:
+      ansible.builtin.apt:
         name:
           - docker.io
         update_cache: true
     - name: Create docker group
-      group:
+      ansible.builtin.group:
         name: docker
         state: present
     - name: Add user to docker group
-      user:
-        append: yes
-        name: "{{ansible_user}}"
+      ansible.builtin.user:
+        append: true
+        name: "{{ ansible_user }}"
         groups: docker
     - name: Sets Docker cgroup driver to systemd
-      copy:
+      ansible.builtin.copy:
         content: |
           {
             "exec-opts": ["native.cgroupdriver=systemd"],
@@ -32,11 +32,11 @@
           }
         dest: /etc/docker/daemon.json
     - name: Create systemd directory
-      file:
+      ansible.builtin.file:
         path: /etc/systemd/system/docker.service.d
         state: directory
     - name: Restart Docker
-      systemd:
+      ansible.builtin.systemd:
         name: docker
         state: restarted
-        daemon_reload: yes
+        daemon_reload: true

@@ -1,19 +1,23 @@
 
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connection-prereqs.html
 data "aws_ami" "ubuntu" {
-  owners      = ["099720109477"]
+  owners      = ["amazon"]
   most_recent = "true"
 
   filter {
-    name = "name"
-    values = ["ubuntu/images-testing/hvm-ssd/ubuntu-kinetic-daily-arm64-server*"]
-    # values = ["ubuntu/images-testing/hvm-ssd/ubuntu-kinetic-daily-amd64-server*"]
-    # values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server*"]
-    # values = ["ubuntu/images/hvm-ssd/ubuntu-hirsute-21.04-amd64-server*"]
-    # values = ["ubuntu/images/hvm-ssd/ubuntu-groovy-20.10-amd64-server*"]
-    # values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server*"]
-    # values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server*"]
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/*"]
   }
+
+  filter {
+    name   = "name"
+    values = ["*22.04*"]
+  }
+  filter {
+    name   = "architecture"
+    values = [var.architecture]
+  }
+
 }
 
 # data "aws_ami" "centos" {
@@ -37,7 +41,11 @@ data "aws_ami" "debian" {
 
   filter {
     name   = "name"
-    values = ["debian-11-arm64-*"]
+    values = ["debian-11-*"]
+  }
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
   }
 }
 
@@ -56,17 +64,17 @@ data "aws_ami" "rehl" {
   }
 }
 
-data "aws_ami" "windows2019" {
-  owners      = ["801119661308"]
-  most_recent = "true"
+# data "aws_ami" "windows2019" {
+#   owners      = ["801119661308"]
+#   most_recent = "true"
 
-  filter {
-    name   = "name"
-    values = ["Windows_Server-2019-English-Core-Containers*"]
-  }
+#   filter {
+#     name   = "name"
+#     values = ["Windows_Server-2019-English-Core-Containers*"]
+#   }
 
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-}
+#   filter {
+#     name   = "architecture"
+#     values = ["x86_64"]
+#   }
+# }

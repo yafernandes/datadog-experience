@@ -1,10 +1,10 @@
-${master.tags.dns_name} ansible_host=${master.tags.dns_name}.${namespace}.${domain}
+${controller.tags.dns_name} ansible_host=${controller.tags.dns_name}.${namespace}.${domain}
 %{ for worker in workers ~}
 ${worker.tags.dns_name} ansible_host=${worker.tags.dns_name}.${namespace}.${domain}
 %{ endfor ~}
 
-[masters]
-${master.tags.dns_name}
+[control_plane]
+${controller.tags.dns_name}
 
 [workers]
 %{ for worker in workers ~}

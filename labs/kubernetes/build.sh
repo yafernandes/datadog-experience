@@ -20,7 +20,8 @@ terraform apply --auto-approve \
   -var="region=$DDEXP_REGION" \
   -var="namespace=$DDEXP_NAMESPACE" \
   -var="creator=$DDEXP_CREATOR" \
-  -var="workers_count=$DDEXP_WORKERS_COUNT"
+  -var="workers_count=$DDEXP_WORKERS_COUNT" \
+  -var="architecture=$DDEXP_ARCHITECTURE"
 cd -
 
 cd ansible
@@ -37,6 +38,7 @@ ansible-playbook -i $DDEXP_NAMESPACE-inventory.txt kubernetes.yaml \
   --ssh-extra-args="-o IdentitiesOnly=yes" \
   -e kube_clustername=$DDEXP_NAMESPACE \
   -e kube_version=$DDEXP_KUBE_VERSION \
+  -e cni=${DDEXP_CNI:-"calico"} \
   -e ansible_ssh_private_key_file=../terraform/$DDEXP_NAMESPACE-private_key.pem
 cd -
 
