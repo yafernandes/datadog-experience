@@ -1,0 +1,28 @@
+- name: Deploy CNI
+  hosts: control_plane
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Get key
+      ansible.builtin.apt_key:
+        url: https://baltocdn.com/helm/signing.asc
+        keyring: /usr/share/keyrings/helm.gpg
+    - name: Add repo
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main"
+        state: present
+    - name: Install required packages
+      ansible.builtin.apt:
+        name:
+          - helm
+        update_cache: true
+    - name: Creates config.yaml for kubeadm
+      become: false
+      ansible.builtin.template:
+        src: cilium-values.yaml.j2
+        dest: cilium-values.yaml
+        mode: '0644'
+    - name: Deploy Cilium
+      ansible.builtin.shell: |
+        helm repo add cilium https://helm.cilium.io/
+        helm install cilium cilium/cilium --version 1.15.0 --namespace kube-system -f cilium-values.yaml
