@@ -1,7 +1,9 @@
+{% if cni == "cilium" %}
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: InitConfiguration
 skipPhases:
 - addon/kube-proxy
+{%  endif %}
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
