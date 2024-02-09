@@ -1,5 +1,7 @@
 operator:
   replicas: 1
+logOptions:
+  format: json
 kubeProxyReplacement: true
 k8sServiceHost: {{ ansible_host }}
 k8sServicePort: 6443
@@ -7,5 +9,15 @@ ipam:
   operator:
     clusterPoolIPv4PodCIDRList:
     - 192.168.0.0/16
-
-
+nodePort:
+  enabled: true
+ingressController:
+  enabled: true
+  default: true
+  enforceHttps: false
+  service:
+    insecureNodePort: 30080
+    secureNodePort: 30443
+    type: NodePort
+gatewayAPI:
+  enabled: true
