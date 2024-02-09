@@ -38,6 +38,10 @@
       register: kubeadm_init
       args:
         creates: /etc/kubernetes/admin.conf
+    - name: Makes kubeconfig available to all
+      ansible.builtin.file:
+        path: /etc/kubernetes/admin.conf
+        mode: 0644
     - name: Sets KUBECONFIG
       ansible.builtin.lineinfile:
         dest: "/etc/environment"
@@ -52,6 +56,12 @@
     - name: Export join command
       ansible.builtin.set_fact:
         join_cmd: "{{ join_cmd.stdout }}"
+
+- name: Deploy GatewayAPI CRDs
+  hosts: controller
+  gather_facts: false
+  tasks:
+  - ansible.builtin.command: kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/experimental-install.yaml --kubeconfig=/etc/kubernetes/admin.conf
 
 - name: Deploy Container Network
   import_playbook: cni-{{ cni }}.yaml
