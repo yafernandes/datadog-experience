@@ -22,7 +22,7 @@ resource "aws_route53_record" "worker" {
 resource "aws_route53_record" "cluster" {
   count   = length(aws_instance.worker)
   zone_id = data.aws_route53_zone.root.zone_id
-  name    = "cluster.${var.namespace}"
+  name    = "*.${var.namespace}"
   type    = "CNAME"
   ttl     = "60"
   weighted_routing_policy {
