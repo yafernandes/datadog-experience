@@ -4,6 +4,10 @@ variable "namespace" {}
 
 variable "region" {}
 
+variable "features" {
+  default = "none"
+}
+
 variable "domain" {
   default = "aws.pipsquack.ca"
 }

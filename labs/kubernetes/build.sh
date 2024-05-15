@@ -15,13 +15,14 @@ fi
 cd terraform
 
 terraform workspace select -or-create=true $DDEXP_NAMESPACE
-
+ 
 terraform apply --auto-approve \
   -var="region=$DDEXP_REGION" \
   -var="namespace=$DDEXP_NAMESPACE" \
   -var="creator=$DDEXP_CREATOR" \
   -var="workers_count=$DDEXP_WORKERS_COUNT" \
-  -var="architecture=$DDEXP_ARCHITECTURE"
+  -var="architecture=$DDEXP_ARCHITECTURE" \
+  -var="features=$DDEXP_FEATURES"
 cd -
 
 cd ansible
@@ -40,7 +41,21 @@ ansible-playbook -i $DDEXP_NAMESPACE-inventory.txt kubernetes.yaml \
   -e kube_version=$DDEXP_KUBE_VERSION \
   -e cni=${DDEXP_CNI:-"calico"} \
   -e ansible_ssh_private_key_file=../terraform/$DDEXP_NAMESPACE-private_key.pem
+
+
+if [[ "$DDEXP_FEATURES" == *"proxy"* ]]; then
+  ansible-playbook -i $DDEXP_NAMESPACE-inventory.txt proxy.yaml \
+    --ssh-extra-args="-o IdentitiesOnly=yes" \
+    -e datadog_api_key=$DDEXP_DD_API_KEY \
+    -e ansible_ssh_private_key_file=../terraform/$DDEXP_NAMESPACE-private_key.pem
+fi
+
 cd -
+
+helm install aws-ebs-csi-driver \
+    --namespace kube-system \
+    aws-ebs-csi-driver/aws-ebs-csi-driver \
+    --set controller.extraVolumeTags.Creator=$DDEXP_CREATOR
 
 chmod 0600 ~/.kube/$DDEXP_NAMESPACE.config
 

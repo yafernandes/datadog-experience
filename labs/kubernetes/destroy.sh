@@ -20,7 +20,8 @@ terraform destroy --auto-approve \
   -var="namespace=$DDEXP_NAMESPACE" \
   -var="creator=$DDEXP_CREATOR" \
   -var="workers_count=$DDEXP_WORKERS_COUNT" \
-  -var="architecture=$DDEXP_ARCHITECTURE"
+  -var="architecture=$DDEXP_ARCHITECTURE" \
+  -var="features=${DD_EXP_FEATURES-none}"
 cd -
 
 resources=$(cat terraform/terraform.tfstate.d/$DDEXP_NAMESPACE/terraform.tfstate | jq '.resources | length')
@@ -39,3 +40,4 @@ if (( $resources == 0 )); then
     rm ~/.kube/$DDEXP_NAMESPACE.config
 fi
 
+exit 0

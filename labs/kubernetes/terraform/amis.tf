@@ -1,5 +1,6 @@
 
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connection-prereqs.html
+# aws ec2 describe-images --owners 136693071363 --filters "Name=name,Values=debian-11-*" "Name=architecture,Values=x86_64" --query 'sort_by(Images, &CreationDate)[]' | jq
 data "aws_ami" "ubuntu" {
   owners      = ["amazon"]
   most_recent = "true"
@@ -56,6 +57,21 @@ data "aws_ami" "rehl" {
   filter {
     name   = "name"
     values = ["RHEL-8.4*"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+}
+
+data "aws_ami" "kali" {
+  owners      = ["679593333241"]
+  most_recent = "true"
+
+  filter {
+    name   = "description"
+    values = ["Kali Linux kali-last-snapshot *"]
   }
 
   filter {

@@ -1,0 +1,71 @@
+- name: Install and configure Squid
+  hosts: proxy
+  become: true
+  tasks:
+    - name: Install Squid
+      ansible.builtin.apt:
+        name:
+          - squid
+        update_cache: true
+    - name: Copy squid.conf
+      ansible.builtin.copy:
+        src: squid.conf
+        dest: /etc/squid/squid.conf
+        owner: proxy
+        group: proxy
+        mode: ug=rw,o=r
+    - name: Restart Squid
+      ansible.builtin.systemd:
+        name: squid
+        state: restarted
+
+# https://github.com/DataDog/ansible-datadog
+# https://galaxy.ansible.com/datadog/datadog
+- name: Install Datadog agent
+  hosts: proxy
+  roles:
+    - role: datadog.datadog
+      become: true
+  vars:
+    datadog_config:
+      env: lab
+      logs_enabled: true
+      process_config:
+        enabled: true
+      apm_config:
+        enabled: false
+      proxy:
+        http: http://localhost:3128/
+        https: http://localhost:3128/
+    network_config:
+      enabled: true
+    runtime_security_config:
+      enabled: true
+    datadog_additional_groups:
+      - systemd-journal
+      - proxy
+    datadog_checks:
+      journald:
+        logs:
+          - type: journald
+      squid:
+        init_config:
+          skip_proxy: true
+        instances:
+          - name: squid
+            service: squid
+        logs:
+          - type: file
+            path: /var/log/squid/cache.log
+            source: squid
+            service: squid
+            tags:
+              - env:lab
+          - type: file
+            path: /var/log/squid/access.log
+            source: squid
+            service: squid
+            log_processing_rules:
+              - type: exclude_at_match
+                name: agent_checks
+                pattern: /squid-internal-mgr/counters
