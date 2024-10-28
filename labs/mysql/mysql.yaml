@@ -19,7 +19,7 @@ metadata:
 rules:
   - apiGroups: [""]
     resources: ["secrets"]
-    resourceNames: ["nginx-secret"]
+    resourceNames: ["db-passwords"]
     verbs: ["get", "watch", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -75,9 +75,10 @@ spec:
           wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/load_salaries1.dump && \
           wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/load_salaries2.dump && \
           wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/load_salaries3.dump && \
-          wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/show_elapsed.sql && \
+          wget -P /initdb https://raw.githubusercontent.com/datacharmer/test_db/master/show_elapsed.sql
           sed -i 's/source /source \/docker-entrypoint-initdb.d\//' /initdb/*
           cp /datadog-setup/* /initdb
+          mv /initdb/employees.sql /initdb/00-employees.sql
       volumeMounts:
         - mountPath: /initdb
           name: initdb
@@ -86,24 +87,22 @@ spec:
   containers:
     - name: mysql 
       image: mysql:8
-      args: 
-        - --default-authentication-plugin=mysql_native_password
       resources:
         requests:
           memory: "832Mi"
           cpu: "5m"
         limits:
           memory: "1Gi"
-          cpu: "1000m"
+          cpu: "1"
       env:
         - name: MYSQL_RANDOM_ROOT_PASSWORD
           value: "true"
         - name: MYSQL_DATABASE
           value: employees
         - name: MYSQL_USER
-          value: admin
+          value: frieren
         - name: MYSQL_PASSWORD
-          value: datad0g
+          value: b3y@nd
       volumeMounts:
         - mountPath: /var/lib/mysql
           name: data
@@ -118,7 +117,7 @@ spec:
     - emptyDir: {}
       name: initdb
     - configMap:
-        name: datadog-setup-8
+        name: datadog-setup
       name: datadog-setup
     - configMap:
         name: datadog-mysql-conf
@@ -127,11 +126,11 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: datadog-setup-8
+  name: datadog-setup
   namespace: mysql
 data:
-  datadog.sql: |
-    CREATE USER 'datadog'@'%' IDENTIFIED WITH mysql_native_password by 'datad0g';
+  50-datadog.sql: |
+    CREATE USER 'datadog'@'%' IDENTIFIED WITH caching_sha2_password by 'datad0g';
     ALTER USER 'datadog'@'%' WITH MAX_USER_CONNECTIONS 5;
     GRANT REPLICATION CLIENT ON *.* TO 'datadog'@'%';
     GRANT PROCESS ON *.* TO 'datadog'@'%';
@@ -197,10 +196,11 @@ metadata:
   name: mysql
   namespace: mysql
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app.kubernetes.io/name: mysql
   ports:
     - name: mysql
+      protocol: TCP
       port: 3306
       targetPort: 3306
