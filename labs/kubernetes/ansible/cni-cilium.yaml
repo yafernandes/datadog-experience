@@ -25,4 +25,4 @@
     - name: Deploy Cilium
       ansible.builtin.shell: |
         helm repo add cilium https://helm.cilium.io/
-        helm install cilium cilium/cilium --version 1.15.0 --namespace kube-system -f cilium-values.yaml
+        helm install cilium cilium/cilium --version 1.17.2 --namespace kube-system -f cilium-values.yaml
