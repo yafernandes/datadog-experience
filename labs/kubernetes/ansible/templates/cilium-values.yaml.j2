@@ -9,15 +9,18 @@ ipam:
   operator:
     clusterPoolIPv4PodCIDRList:
     - 192.168.0.0/16
+prometheus:
+  enabled: true
 nodePort:
   enabled: true
 ingressController:
   enabled: true
   default: true
+  loadbalancerMode: shared
   enforceHttps: false
   service:
+    type: NodePort
     insecureNodePort: 30080
     secureNodePort: 30443
-    type: NodePort
 gatewayAPI:
   enabled: true
