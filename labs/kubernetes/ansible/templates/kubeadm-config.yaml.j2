@@ -1,18 +1,12 @@
 {% if cni == "cilium" %}
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: InitConfiguration
 skipPhases:
 - addon/kube-proxy
 {%  endif %}
 ---
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
-kubernetesVersion: {{ kube_version }}
-clusterName: {{ kube_clustername }}
-controlPlaneEndpoint: {{ ansible_host }}
-networking:
-  podSubnet: 192.168.0.0/16
-  serviceSubnet: 172.16.0.0/12
 apiServer:
   certSANs:
   - {{ ansible_facts.fqdn }}
@@ -21,24 +15,38 @@ apiServer:
   - {{ ip }}
 {% endfor %}
   extraArgs:
-    logging-format: json 
-    audit-log-path: '-'
-    audit-policy-file: /etc/kubernetes/kube-apiserver/audit-policy.yaml
+  - name: logging-format
+    value: json
+  - name: audit-log-path
+    value: '-'
+  - name: audit-policy-file
+    value: /etc/kubernetes/kube-apiserver/audit-policy.yaml
   extraVolumes:
   - name: kube-apiserver
     hostPath: /etc/kubernetes/kube-apiserver
     mountPath: /etc/kubernetes/kube-apiserver
     readOnly: true
-scheduler:
-  extraArgs:
-    bind-address: 0.0.0.0
-    logging-format: json 
+clusterName: {{ kube_clustername }}
+controlPlaneEndpoint: {{ ansible_host }}
 controllerManager:
   extraArgs:
-    bind-address: 0.0.0.0
-    logging-format: json 
+  - name: bind-address
+    value: 0.0.0.0
+  - name: logging-format
+    value: json
+kubernetesVersion: {{ kube_version }}
+networking:
+  podSubnet: 192.168.0.0/16
+  serviceSubnet: 172.16.0.0/12
+scheduler:
+  extraArgs:
+  - name: bind-address
+    value: 0.0.0.0
+  - name: logging-format
+    value: json
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
+providerID: {{ provider_id }}
 logging:
   format: json

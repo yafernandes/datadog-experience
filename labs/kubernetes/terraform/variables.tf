@@ -1,31 +1,45 @@
-variable "creator" {}
+variable "aws_region" {}
 
-variable "namespace" {}
+variable "aws_profile" {}
 
-variable "region" {}
+variable "owner" {}
 
-variable "features" {
-  default = "none"
+variable "team" {
+  default = "lab"
 }
 
-variable "domain" {
-  default = "aws.pipsquack.ca"
-}
+variable "domain" {}
 
-variable "workers_count" {}
+variable "subdomain" {}
+
+variable "workers_count" {
+  default = 3
+}
 
 variable "architecture" {
   default = "x86_64"
   validation {
     condition     = contains(["x86_64", "arm64"], var.architecture)
-    error_message = "Invalid architecture. Valid options are amd64 or arm64."
+    error_message = "Invalid architecture. Valid options are x86_64 or arm64."
   }
 }
+
+variable "controller_instance_type" {}
+
+variable "worker_instance_type" {}
 
 variable "instance_types" {
   type = map(string)
   default = {
     "x86_64" = "t3a.large"
-    "arm64" = "t4g.large"
+    "arm64"  = "t4g.large"
   }
+}
+
+variable "features" {
+  default = "none"
+}
+
+variable "output_dir" {
+  default = "."
 }

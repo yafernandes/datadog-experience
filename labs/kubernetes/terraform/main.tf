@@ -1,6 +1,6 @@
 provider "aws" {
-  region  = var.region
-  profile = "datadog"
+  region  = var.aws_region
+  profile = var.aws_profile
 }
 
 resource "tls_private_key" "ssh" {
@@ -9,7 +9,7 @@ resource "tls_private_key" "ssh" {
 }
 
 resource "local_sensitive_file" "key_file" {
-  filename        = "${var.namespace}-private_key.pem"
+  filename        = "${var.output_dir}/private_key.pem"
   file_permission = "600"
   content         = tls_private_key.ssh.private_key_pem
 }
@@ -32,19 +32,23 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "node" {
-  name                = "${var.namespace}-node"
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"]
-  assume_role_policy  = data.aws_iam_policy_document.assume_role.json
+  name               = "${var.subdomain}-node"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "EBSCSIDriver" {
+  role       = aws_iam_role.node.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 }
 
 resource "aws_iam_instance_profile" "node" {
-  name = "${var.namespace}-node"
+  name = "${var.subdomain}-node"
   role = aws_iam_role.node.name
 }
 
 resource "aws_instance" "controller" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.instance_types[var.architecture]
+  instance_type          = var.controller_instance_type
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.main.id]
   key_name               = aws_key_pair.main.key_name
@@ -55,21 +59,25 @@ resource "aws_instance" "controller" {
   }
 
   tags = {
-    Name     = "[${var.namespace}] controller"
-    Creator  = var.creator
-    dns_name = "controller"
+    Name      = "[${var.subdomain}] controller"
+    Owner     = var.owner
+    Team      = var.team
+    CreatedBy = "Terrform"
+    dns_name  = "controller"
   }
 
   volume_tags = {
-    Name    = "[${var.namespace}] controller"
-    Creator = var.creator
+    Name      = "[${var.subdomain}] controller"
+    Owner     = var.owner
+    Team      = var.team
+    CreatedBy = "Terrform"
   }
 }
 
 resource "aws_instance" "worker" {
   count                  = var.workers_count
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.instance_types[var.architecture]
+  instance_type          = var.worker_instance_type
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.main.id]
   key_name               = aws_key_pair.main.key_name
@@ -80,14 +88,19 @@ resource "aws_instance" "worker" {
   }
 
   tags = {
-    Name     = "[${var.namespace}] worker ${format("%02v", count.index)}"
-    Creator  = var.creator
-    dns_name = "worker${format("%02v", count.index)}"
+    Name      = "[${var.subdomain}] worker ${format("%02v", count.index)}"
+    Owner     = var.owner
+    Team      = var.team
+    CreatedBy = "Terrform"
+    dns_name  = "worker${format("%02v", count.index)}"
   }
 
   volume_tags = {
-    Name    = "[${var.namespace}] Worker ${format("%02v", count.index)}"
-    Creator = var.creator
+    Name      = "[${var.subdomain}] Worker ${format("%02v", count.index)}"
+    Owner     = var.owner
+    Team      = var.team
+    CreatedBy = "Terrform"
+    Team      = var.team
   }
 }
 
@@ -104,14 +117,18 @@ resource "aws_instance" "proxy" {
   }
 
   tags = {
-    Name     = "[${var.namespace}] proxy"
-    Creator  = var.creator
-    dns_name = "proxy"
+    Name      = "[${var.subdomain}] proxy"
+    Owner     = var.owner
+    Team      = var.team
+    CreatedBy = "Terrform"
+    dns_name  = "proxy"
   }
 
   volume_tags = {
-    Name    = "[${var.namespace}] Proxy"
-    Creator = var.creator
+    Name      = "[${var.subdomain}] Proxy"
+    Owner     = var.owner
+    CreatedBy = "Terrform"
+    Team      = var.team
   }
 }
 
@@ -128,18 +145,23 @@ resource "aws_instance" "kali" {
   }
 
   tags = {
-    Name     = "[${var.namespace}] Kali"
-    Creator  = var.creator
-    dns_name = "kali"
+    Name      = "[${var.subdomain}] Kali"
+    Owner     = var.owner
+    Team      = var.team
+    CreatedBy = "Terrform"
+    dns_name  = "kali"
   }
 
   volume_tags = {
-    Name    = "[${var.namespace}] Kali"
-    Creator = var.creator
+    Name      = "[${var.subdomain}] Kali"
+    Owner     = var.owner
+    Team      = var.team
+    CreatedBy = "Terrform"
   }
 }
 
 resource "local_file" "ansible_inventory" {
-  content  = templatefile("inventory.tmpl", { controller = aws_instance.controller, workers = aws_instance.worker, namespace = var.namespace, domain = var.domain, features = var.features })
-  filename = "../ansible/${var.namespace}-inventory.txt"
+  content              = templatefile("inventory.tmpl", { controller = aws_instance.controller, workers = aws_instance.worker, subdomain = var.subdomain, domain = var.domain, features = var.features })
+  filename             = "${var.output_dir}/inventory.txt"
+  directory_permission = 666
 }

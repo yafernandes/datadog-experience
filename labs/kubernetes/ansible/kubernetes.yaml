@@ -23,6 +23,19 @@
   hosts: control_plane
   become: true
   tasks:
+    - name: Get EC2 instance ID
+      uri:
+        url: http://169.254.169.254/latest/meta-data/instance-id
+        return_content: yes
+      register: instance_id
+    - name: Get availability zone
+      uri:
+        url: http://169.254.169.254/latest/meta-data/placement/availability-zone
+        return_content: yes
+      register: availability_zone
+    - name: Set providerID fact
+      set_fact:
+        provider_id: "aws:///{{ availability_zone.content }}/{{ instance_id.content }}"
     - name: Creates config.yaml for kubeadm
       ansible.builtin.template:
         src: kubeadm-config.yaml.j2
@@ -61,7 +74,7 @@
   hosts: controller
   gather_facts: false
   tasks:
-  - ansible.builtin.command: kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/experimental-install.yaml --kubeconfig=/etc/kubernetes/admin.conf
+  - ansible.builtin.command: kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/experimental-install.yaml --kubeconfig=/etc/kubernetes/admin.conf
 
 - name: Deploy Container Network
   import_playbook: cni-{{ cni }}.yaml
@@ -83,5 +96,5 @@
       become: true
       ansible.builtin.fetch:
         src: /etc/kubernetes/admin.conf
-        dest: "{{ lookup('env', 'HOME') }}/.kube/{{ kube_clustername }}.config"
+        dest: "{{ lookup('env', 'DATA_DIR') }}/config"
         flat: true

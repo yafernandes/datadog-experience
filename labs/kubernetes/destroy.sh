@@ -1,43 +1,43 @@
 #!/bin/bash
-set -euo pipefail
+set -euox pipefail
 IFS=$'\n\t'
 
-if [ ! -f $1.env ]; then
-  echo -e "\033[0;31mEnv file does not exist\033[0m\007"
-  ls  -1 *.env | xargs -n 1 basename
-  exit 1
+export SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export DATA_DIR="$SCRIPT_DIR/clusters/$1"
+
+if [ -d $DATA_DIR ]
+then
+  cd $DATA_DIR
+  if [ -f "$DATA_DIR/settings.yaml" ]
+  then
+    for key in $(yq e 'keys | .[]' "$DATA_DIR/settings.yaml"); do
+      value=$(yq e ".\"$key\"" "$DATA_DIR/settings.yaml")
+      export TF_VAR_$key="$value"
+    done
+  else
+    echo -e "\033[0;31mFile variables.yaml is missing\033[0m\007"
+    exit 1
+  fi
 else
-  source $1.env
-  DDEXP_NAMESPACE=$1
+  echo -e "\033[0;31mProfile does not exist\033[0m\007"
+  exit 1
 fi
 
-cd terraform
+cd $SCRIPT_DIR/terraform
 
-terraform workspace select $DDEXP_NAMESPACE
+terraform \
+  destroy \
+  -state="$DATA_DIR/terraform.tfstate" \
+  -var="output_dir=$DATA_DIR" \
+  --auto-approve
 
-terraform destroy --auto-approve \
-  -var="region=$DDEXP_REGION" \
-  -var="namespace=$DDEXP_NAMESPACE" \
-  -var="creator=$DDEXP_CREATOR" \
-  -var="workers_count=$DDEXP_WORKERS_COUNT" \
-  -var="architecture=$DDEXP_ARCHITECTURE" \
-  -var="features=${DD_EXP_FEATURES-none}"
 cd -
 
-resources=$(cat terraform/terraform.tfstate.d/$DDEXP_NAMESPACE/terraform.tfstate | jq '.resources | length')
+cd $DATA_DIR
 
-if (( $resources == 0 )); then
-    set +eo pipefail
+rm -f config
+rm -f inventory.txt
+rm -f private_key.pem
+rm -f terraform.tfstate*
 
-    cd terraform
-    terraform workspace select default
-    terraform workspace delete $DDEXP_NAMESPACE
-    cd -
-
-    rm terraform/$DDEXP_NAMESPACE-private_key.pem
-    rm ansible/$DDEXP_NAMESPACE-inventory.txt
-    rm $DDEXP_NAMESPACE.zip
-    rm ~/.kube/$DDEXP_NAMESPACE.config
-fi
-
-exit 0
+cd -

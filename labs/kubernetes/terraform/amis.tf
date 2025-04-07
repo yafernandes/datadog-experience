@@ -1,6 +1,7 @@
 
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connection-prereqs.html
-# aws ec2 describe-images --owners 136693071363 --filters "Name=name,Values=debian-11-*" "Name=architecture,Values=x86_64" --query 'sort_by(Images, &CreationDate)[]' | jq
+# aws ec2 describe-images --owners 136693071363 --filters "Name=name,Values=debian-11-*" "Name=architecture,Values=x86_64" --query 'sort_by(Images, &CreationDate)[]' --region us-east-1 | jq
+# aws ec2 describe-images --owners 099720109477 --filters "Name=name,Values=ubuntu/images/hvm-ssd/*" "Name=architecture,Values=x86_64" --query 'sort_by(Images, &CreationDate)[]' --region us-east-1 | jq
 data "aws_ami" "ubuntu" {
   owners      = ["amazon"]
   most_recent = "true"

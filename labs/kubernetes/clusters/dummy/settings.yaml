@@ -1,0 +1,19 @@
+aws_region: us-east-1
+aws_profile: dummy
+domain: dummy.org
+subdomain: jdoe
+
+owner: john.doe
+team: lab
+
+architecture: "arm64"
+controller_instance_type: "t4g.large"
+workers_count: 3
+worker_instance_type: "t4g.large"
+
+kube_clustername: "kubeadm"
+kube_version: "1.32.3"
+cni: "cilium"
+
+features: "none"
+datadog_api_key: xxx 

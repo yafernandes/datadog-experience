@@ -1,14 +1,14 @@
-${controller.tags.dns_name} ansible_host=${controller.tags.dns_name}.${namespace}.${domain}
+${controller.tags.dns_name} ansible_host=${controller.tags.dns_name}.${subdomain}.${domain}
 %{ for worker in workers ~}
-${worker.tags.dns_name} ansible_host=${worker.tags.dns_name}.${namespace}.${domain}
+${worker.tags.dns_name} ansible_host=${worker.tags.dns_name}.${subdomain}.${domain}
 %{ endfor ~}
 
 %{if strcontains(features, "proxy")}
-proxy ansible_host=proxy.${namespace}.${domain}
+proxy ansible_host=proxy.${subdomain}.${domain}
 %{endif}
 
 %{if strcontains(features, "kali")}
-kali ansible_host=kali.${namespace}.${domain}
+kali ansible_host=kali.${subdomain}.${domain}
 %{endif}
 
 [control_plane]
