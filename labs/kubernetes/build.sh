@@ -61,29 +61,26 @@ ansible-playbook proxy.yaml \
 
 cd -
 
-cd $DATA_DIR
-
 export KUBECONFIG=$DATA_DIR/config
 
-helm install aws-ebs-csi-driver \
-    --namespace kube-system \
-    aws-ebs-csi-driver/aws-ebs-csi-driver \
-    --set controller.extraVolumeTags.Creator=$TF_VAR_owner
+helm install aws-cloud-controller-manager aws-cloud-controller-manager/aws-cloud-controller-manager -f $SCRIPT_DIR/cloud-provider-aws-values.yaml --wait
 
-if [ -f $DATA_DIR/secrets.yaml ]
-then
-  kubectl apply -f $DATA_DIR/secrets.yaml
-  if [ -f $DATA_DIR/datadog-values.yaml ]
-  then
-    helm install datadog datadog/datadog -n datadog -f $DATA_DIR/datadog-values.yaml
-  fi  
-fi
+cd $DATA_DIR
 
 zip "cluster_$(date +"%Y%m%d_%H%M%S").zip" config inventory.txt private_key.pem terraform.tfstate settings.yaml
 
-cd -
+if [ -f secrets.yaml ]
+then
+  kubectl apply -f secrets.yaml
+  if [ -f datadog-values.yaml ]
+  then
+    helm install datadog datadog/datadog -n datadog -f datadog-values.yaml
+  fi  
+fi
 
-for script in $(find "$DATA_DIR/init" -maxdepth 1 -type f -perm -100 | sort); do
-  kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=300s
+for script in $(find "init" -maxdepth 1 -type f -perm -100 | sort); do
   "$script"
 done
+
+cd -
+

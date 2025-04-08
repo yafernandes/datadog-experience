@@ -8,6 +8,8 @@ variable "team" {
   default = "lab"
 }
 
+variable "kube_clustername" {}
+
 variable "domain" {}
 
 variable "subdomain" {}

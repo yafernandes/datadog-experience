@@ -59,18 +59,21 @@ resource "aws_instance" "controller" {
   }
 
   tags = {
-    Name      = "[${var.subdomain}] controller"
-    Owner     = var.owner
-    Team      = var.team
-    CreatedBy = "Terrform"
-    dns_name  = "controller"
+    Name                                            = "[${var.subdomain}] controller"
+    Owner                                           = var.owner
+    Team                                            = var.team
+    CreatedBy                                       = "Terrform"
+    "kubernetes.io/cluster/${var.kube_clustername}" = "owned"
+    dns_name                                        = "controller"
   }
 
   volume_tags = {
-    Name      = "[${var.subdomain}] controller"
-    Owner     = var.owner
-    Team      = var.team
-    CreatedBy = "Terrform"
+    Name                                            = "[${var.subdomain}] controller"
+    Owner                                           = var.owner
+    Team                                            = var.team
+    CreatedBy                                       = "Terrform"
+    "kubernetes.io/cluster/${var.kube_clustername}" = "owned"
+    CreatedBy                                       = "Terrform"
   }
 }
 
@@ -88,19 +91,21 @@ resource "aws_instance" "worker" {
   }
 
   tags = {
-    Name      = "[${var.subdomain}] worker ${format("%02v", count.index)}"
-    Owner     = var.owner
-    Team      = var.team
-    CreatedBy = "Terrform"
-    dns_name  = "worker${format("%02v", count.index)}"
+    Name                                            = "[${var.subdomain}] worker ${format("%02v", count.index)}"
+    Owner                                           = var.owner
+    Team                                            = var.team
+    CreatedBy                                       = "Terrform"
+    "kubernetes.io/cluster/${var.kube_clustername}" = "owned"
+    dns_name                                        = "worker${format("%02v", count.index)}"
   }
 
   volume_tags = {
-    Name      = "[${var.subdomain}] Worker ${format("%02v", count.index)}"
-    Owner     = var.owner
-    Team      = var.team
-    CreatedBy = "Terrform"
-    Team      = var.team
+    Name                                            = "[${var.subdomain}] Worker ${format("%02v", count.index)}"
+    Owner                                           = var.owner
+    Team                                            = var.team
+    CreatedBy                                       = "Terrform"
+    "kubernetes.io/cluster/${var.kube_clustername}" = "owned"
+    Team                                            = var.team
   }
 }
 

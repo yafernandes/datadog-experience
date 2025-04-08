@@ -1,0 +1,7 @@
+image:
+    tag: v1.30.8
+
+args:
+  - --v=2
+  - --cloud-provider=aws
+  - --configure-cloud-routes=false

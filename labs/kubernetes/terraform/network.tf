@@ -17,10 +17,11 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
 
   tags = {
-    Name      = "${var.subdomain} Kubernetes"
-    Owner     = var.owner
-    Team      = var.team
-    CreatedBy = "Terrform"
+    Name                                            = "${var.subdomain} Kubernetes"
+    Owner                                           = var.owner
+    Team                                            = var.team
+    CreatedBy                                       = "Terrform"
+    "kubernetes.io/cluster/${var.kube_clustername}" = "owned"
   }
 }
 
@@ -31,10 +32,11 @@ resource "aws_subnet" "main" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name      = "${var.subdomain} Kubernetes"
-    Owner     = var.owner
-    Team      = var.team
-    CreatedBy = "Terrform"
+    Name                                            = "${var.subdomain} Kubernetes"
+    Owner                                           = var.owner
+    Team                                            = var.team
+    CreatedBy                                       = "Terrform"
+    "kubernetes.io/cluster/${var.kube_clustername}" = "owned"
   }
 }
 
@@ -84,10 +86,11 @@ resource "aws_security_group" "main" {
   }
 
   tags = {
-    Name      = "${var.subdomain} Kubernetes"
-    Owner     = var.owner
-    Team      = var.team
-    CreatedBy = "Terrform"
+    Name                                            = "${var.subdomain} Kubernetes"
+    Owner                                           = var.owner
+    Team                                            = var.team
+    CreatedBy                                       = "Terrform"
+    "kubernetes.io/cluster/${var.kube_clustername}" = "owned"
   }
 }
 
@@ -95,10 +98,11 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name      = "${var.subdomain} Kubernetes"
-    Owner     = var.owner
-    Team      = var.team
-    CreatedBy = "Terrform"
+    Name                                            = "${var.subdomain} Kubernetes"
+    Owner                                           = var.owner
+    Team                                            = var.team
+    CreatedBy                                       = "Terrform"
+    "kubernetes.io/cluster/${var.kube_clustername}" = "owned"
   }
 }
 
@@ -111,10 +115,11 @@ resource "aws_route_table" "main" {
   }
 
   tags = {
-    Name      = "${var.subdomain} Kubernetes"
-    Owner     = var.owner
-    Team      = var.team
-    CreatedBy = "Terrform"
+    Name                                            = "${var.subdomain} Kubernetes"
+    Owner                                           = var.owner
+    Team                                            = var.team
+    CreatedBy                                       = "Terrform"
+    "kubernetes.io/cluster/${var.kube_clustername}" = "owned"
   }
 }
 

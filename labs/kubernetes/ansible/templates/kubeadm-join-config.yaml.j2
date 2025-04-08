@@ -1,0 +1,12 @@
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: JoinConfiguration
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: "{{ hostvars['controller']['ansible_hostname'] }}:6443"
+    token: "{{ hostvars['controller'].bootstrap_token.stdout }}"
+    unsafeSkipCAVerification: true
+nodeRegistration:
+  name: {{ full_hostname.stdout }}
+  kubeletExtraArgs:
+    - name: cloud-provider
+      value: external

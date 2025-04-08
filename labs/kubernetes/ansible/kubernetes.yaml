@@ -18,27 +18,19 @@
           - kubeadm={{ kube_version }}-*
           - kubectl={{ kube_version }}-*
         update_cache: true
+    - name: Gets full hostname
+      ansible.builtin.command: hostname -f
+      register: full_hostname
+      changed_when: true
+
 
 - name: Init controller
   hosts: control_plane
   become: true
   tasks:
-    - name: Get EC2 instance ID
-      uri:
-        url: http://169.254.169.254/latest/meta-data/instance-id
-        return_content: yes
-      register: instance_id
-    - name: Get availability zone
-      uri:
-        url: http://169.254.169.254/latest/meta-data/placement/availability-zone
-        return_content: yes
-      register: availability_zone
-    - name: Set providerID fact
-      set_fact:
-        provider_id: "aws:///{{ availability_zone.content }}/{{ instance_id.content }}"
     - name: Creates config.yaml for kubeadm
       ansible.builtin.template:
-        src: kubeadm-config.yaml.j2
+        src: kubeadm-init-config.yaml.j2
         dest: config.yaml
         mode: '0440'
     - name: Copy policy.yaml
@@ -62,13 +54,9 @@
     - name: Kubeadm init output
       ansible.builtin.debug:
         var: kubeadm_init.stderr_lines
-    - name: Get Kubernets join cluster command
-      ansible.builtin.command: kubeadm token create --print-join-command
-      changed_when: false
-      register: join_cmd
-    - name: Export join command
-      ansible.builtin.set_fact:
-        join_cmd: "{{ join_cmd.stdout }}"
+    - name: Create a kubeadm bootstrap token
+      command: kubeadm token create
+      register: bootstrap_token
 
 - name: Deploy GatewayAPI CRDs
   hosts: controller
@@ -84,8 +72,13 @@
   gather_facts: false
   become: true
   tasks:
+    - name: Creates config.yaml for kubeadm
+      ansible.builtin.template:
+        src: kubeadm-join-config.yaml.j2
+        dest: config.yaml
+        mode: '0440'
     - name: Joining cluster
-      ansible.builtin.command: "{{ hostvars['controller'].join_cmd }}"
+      ansible.builtin.command: "kubeadm join --config config.yaml"
       changed_when: false
 
 - name: Updates local kubectl config
