@@ -15,11 +15,3 @@
       ansible.builtin.apt:
         upgrade: full
         update_cache: true
-    - name: Set hostname
-      ansible.builtin.hostname:
-        name: "{{ ansible_host }}"
-    - name: Set /etc/hostname
-      ansible.builtin.copy:
-        content: "{{ ansible_host }}"
-        dest: /etc/hostname
-        mode: '0644'
